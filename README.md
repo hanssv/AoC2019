@@ -14,6 +14,16 @@ also included gas for the mass of the gas required, making the problem (triviall
 There were no problems writing a [solution](01/sol_01.aes) in Sophia, the recursion is done
 with an accumulator to save some gas.
 
+### [Day 2](02/sol_02.aes)
+
+The second problem introduce the `Intcode` virtual machine, where a sequence of integers
+should be interpreted as op-codes and arguments. The first version of this machine only does
+`add` and `mul` but I have a feeling this machine will come back in later problems. The first
+half of the puzzle was trivial, the second half took ages to compute (not to implement). But
+after I had up:ed the gas limit (see below) and split the setup of the `Intcode` machine
+memory into setup and initialization it can be run in about 20 seconds on a normal laptop.
+(Consuming a measly 1503823113 of gas...)
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't even want to
 run them via contract calls etc. Instead we re-use part of the test framework in this way:
