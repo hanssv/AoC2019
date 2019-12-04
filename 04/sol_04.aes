@@ -1,0 +1,50 @@
+contract Day_4 =
+  entrypoint solve_1() =
+    check_pwds(256310, 732736, check_pwd)
+
+  entrypoint solve_2() =
+    check_pwds(256310, 732736, check_pwd')
+
+  function check_pwds(from : int, to : int, chk_fun : (int) => bool) =
+    check_pwds'(from, to, chk_fun, 0)
+
+  function check_pwds'(x, to, chk_fun : (int) => bool, acc) =
+    if(x > to) acc
+    else
+      switch(increasing(x, 100000))
+        (true, _) => if(chk_fun(x)) check_pwds'(x + 1, to, chk_fun, acc + 1)
+                     else           check_pwds'(x + 1, to, chk_fun, acc)
+        (_, x1)   => check_pwds'(x1, to, chk_fun, acc)
+
+  entrypoint increasing(x, fac) =
+    if(fac == 1) (true, 0)
+    else
+      let fac' = fac / 10
+      let d1 = (x / fac)  mod 10
+      let d2 = (x / fac') mod 10
+      if(d2 < d1) (false, x + (fac' - x mod fac' + (d1 - d2 - 1) * fac'))
+      else        increasing(x, fac')
+
+  entrypoint check_pwd(x) =
+    let d1 = x / 100000
+    let d2 = (x / 10000) mod 10
+    let d3 = (x / 1000)  mod 10
+    let d4 = (x / 100)   mod 10
+    let d5 = (x / 10)    mod 10
+    let d6 = x           mod 10
+    if(d1 == d2 || d2 == d3 || d3 == d4 || d4 == d5 || d5 == d6) true
+    else false
+
+  entrypoint check_pwd'(x) =
+    let d1 = x / 100000
+    let d2 = (x / 10000) mod 10
+    let d3 = (x / 1000)  mod 10
+    let d4 = (x / 100)   mod 10
+    let d5 = (x / 10)    mod 10
+    let d6 = x           mod 10
+    if((d1 == d2 && d2 != d3)
+       || (d2 == d3 && d1 != d2 && d3 != d4)
+       || (d3 == d4 && d2 != d3 && d4 != d5)
+       || (d4 == d5 && d3 != d4 && d5 != d6)
+       || (d5 == d6 && d4 != d5)) true
+    else false

@@ -1,41 +1,58 @@
 # Advent of Code - 2019
 
-This repository contains solutions to the [Advent of Code 2019](https://adventofcode.com/2019).
-There are many such repositories floating around, the twist in this case is that the solutions
-are written in [Sophia](https://github.com/aeternity/protocol/blob/master/contracts/sophia.md)
-the smart contract language for the [Aeternity blockchain](https://aeternity.com/).
+This repository contains solutions to the [Advent of Code
+2019](https://adventofcode.com/2019). There are many such repositories floating
+around, the twist in this case is that the solutions are written in
+[Sophia](https://github.com/aeternity/protocol/blob/master/contracts/sophia.md)
+the smart contract language for the [Aeternity
+blockchain](https://aeternity.com/).
 
 ### [Day 1](01/sol_01.aes)
 
-This year's Advent of Code started off with a straightforward problem. You had to create fuel
-consumption for a number of objects depending on their mass. The second part of the problem
-also included gas for the mass of the gas required, making the problem (trivially) recursive.
+This year's Advent of Code [started](https://adventofcode.com/2019/day/1) with
+a straightforward problem. You had to create fuel consumption for a number of
+objects depending on their mass. The second part of the problem also included
+gas for the mass of the gas required, making the problem (trivially) recursive.
 
-There were no problems writing a [solution](01/sol_01.aes) in Sophia, the recursion is done
-with an accumulator to save some gas.
+There were no problems writing a [solution](01/sol_01.aes) in Sophia, the
+recursion is done with an accumulator to save some gas.
 
 ### [Day 2](02/sol_02.aes)
 
-The second problem introduce the `Intcode` virtual machine, where a sequence of integers
-should be interpreted as op-codes and arguments. The first version of this machine only does
-`add` and `mul` but I have a feeling this machine will come back in later problems. The first
-half of the puzzle was trivial, the second half took ages to compute (not to implement). But
-after I had up:ed the gas limit (see below) and split the setup of the `Intcode` machine
-memory into setup and initialization it can be run in about 20 seconds on a normal laptop.
-(Consuming a measly 1503823113 of gas...)
+The [second problem](https://adventofcode.com/2019/day/2) introduce the
+`Intcode` virtual machine, where a sequence of integers should be interpreted
+as op-codes and arguments. The first version of this machine only does `add`
+and `mul` but I have a feeling this machine will come back in later problems.
+The first half of the puzzle was trivial, the second half took ages to compute
+(not to implement). But after I had up:ed the gas limit (see below) and split
+the setup of the `Intcode` machine memory into setup and initialization it can
+be run in about 20 seconds on a normal laptop. (Consuming a measly 1503823113
+of gas...)
 
 ### [Day 3](03/sol_03.aes)
 
-The third problem was a grid puzzle. Two long and twisting wires should be analyzed for
-crossings. And the task was to return the crossing nearest to the starting point (and the
-crossing with shortest steps from the starting point in part 2). For efficiency reasons
-I decided to sacrifice compact code for repeating myself a bit. There is an overlap
-between part 1 and part 2, but the solution is basically repeated twice. In the end it
-solves the problem for my input in about 20 seconds.
+The [third problem](https://adventofcode.com/2019/day/3) was a grid puzzle. Two
+long and twisting wires should be analyzed for crossings. And the task was to
+return the crossing nearest to the starting point (and the crossing with
+shortest steps from the starting point in part 2). For efficiency reasons I
+decided to sacrifice compact code for repeating myself a bit. There is an
+overlap between part 1 and part 2, but the solution is basically repeated
+twice. In the end it solves the problem for my input in about 20 seconds.
+
+### [Day 4](04/sol_04.aes)
+
+The [fourth problem](https://adventofcode.com/2019/day/4) was about checking
+integer "passwords" for some somewhat strange properties. The straightforward
+solution looping over all integers and checking them one by one worked. But it
+was really slow (upwards of two minutes) - so in the end I decided to use one
+of the properties (digits must be increasing) to skip over many integers at the
+same time. This improved the solution a lot, and it now even fits in a single
+block (5.7M gas) and runs in about half a second.
 
 ## Running contracts
-For obvious reasons I don't want to run these contracts on-chain, and I don't even want to
-run them via contract calls etc. Instead we re-use part of the test framework in this way:
+For obvious reasons I don't want to run these contracts on-chain, and I don't
+even want to run them via contract calls etc. Instead we re-use part of the
+test framework in this way:
 
 ```
 ~/Quviq/Aeternity: git clone git@github.com:aeternity/aeternity.git
