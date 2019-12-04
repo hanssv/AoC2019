@@ -1,0 +1,205 @@
+include "List.aes"
+contract Day_3 =
+  datatype wire = R(int) | U(int) | L(int) | D(int)
+
+  entrypoint solve_1() =
+    solve_1'(input())
+
+  function solve_1'(ws : list(list(wire))) =
+    switch(ws)
+      [w1, w2] =>
+        let m  = populate(0, 0, w1, {})
+        let xs = cross_wire(0, 0, w2, m, [])
+        min(cmp, xs)
+
+  function cmp(p, q) =
+    switch((p, q))
+      ((x1, y1), (x2, y2)) =>
+        (abs(x1) + abs(y1)) =< (abs(x2) + abs(y2))
+
+  function populate(x : int, y : int, ws : list(wire), m : map(int * int, unit)) =
+    switch(ws)
+      [] => m
+      (R(r) :: ws) => pop_h(1,  x, y, r, ws, m)
+      (L(l) :: ws) => pop_h(-1, x, y, l, ws, m)
+      (U(u) :: ws) => pop_v(1,  x, y, u, ws, m)
+      (D(d) :: ws) => pop_v(-1, x, y, d, ws, m)
+
+  function pop_h(d, x, y, i, ws, m) =
+    let x' = x + d
+    if(i == 1) populate(x', y, ws, m)
+    else pop_h(d, x', y, i - 1, ws, m{[(x', y)] = ()})
+
+  function pop_v(d, x, y, i, ws, m) =
+    let y' = y + d
+    if(i == 1) populate(x, y', ws, m)
+    else pop_v(d, x, y', i - 1, ws, m{[(x, y')] = ()})
+
+  function cross_wire(x, y, ws, m, acc) =
+    switch(ws)
+      [] => acc
+      (R(r) :: ws) => chk_h(1,  x, y, r, ws, m, acc)
+      (L(l) :: ws) => chk_h(-1, x, y, l, ws, m, acc)
+      (U(u) :: ws) => chk_v(1,  x, y, u, ws, m, acc)
+      (D(d) :: ws) => chk_v(-1, x, y, d, ws, m, acc)
+
+  function chk_h(d, x, y, i, ws, m, acc) =
+    let x' = x + d
+    if(i == 1) cross_wire(x', y, ws, m, acc)
+    else switch(Map.member((x', y), m))
+            false => chk_h(d, x', y, i - 1, ws, m, acc)
+            true  => chk_h(d, x', y, i - 1, ws, m, (x', y) :: acc)
+
+  function chk_v(d, x, y, i, ws, m, acc) =
+    let y' = y + d
+    if(i == 1) cross_wire(x, y', ws, m, acc)
+    else switch(Map.member((x, y'), m))
+            false => chk_v(d, x, y', i - 1, ws, m, acc)
+            true  => chk_v(d, x, y', i - 1, ws, m, (x, y') :: acc)
+
+  entrypoint solve_2() =
+    solve_2'(input())
+
+  function solve_2'(ws : list(list(wire))) =
+    switch(ws)
+      [w1, w2] =>
+        let m  = populate'(1, 0, 0, w1, {})
+        let xs = cross_wire'(1, 0, 0, w2, m, [])
+        min(cmp', xs)
+
+  function cmp'(p, q) =
+    switch((p, q))
+      ((x, _), (y, _)) => x =< y
+
+  function populate'(s : int, x : int, y : int, ws : list(wire), m : map(int * int, int)) =
+    switch(ws)
+      [] => m
+      (R(r) :: ws) => pop_h'(s, 1,  x, y, r, ws, m)
+      (L(l) :: ws) => pop_h'(s, -1, x, y, l, ws, m)
+      (U(u) :: ws) => pop_v'(s, 1,  x, y, u, ws, m)
+      (D(d) :: ws) => pop_v'(s, -1, x, y, d, ws, m)
+
+  function pop_h'(s, d, x, y, i, ws, m) =
+    let x' = x + d
+    let s' = s + 1
+    if(i == 1) populate'(s', x', y, ws, m)
+    else pop_h'(s', d, x', y, i - 1, ws, m{[(x', y)] = s})
+
+  function pop_v'(s, d, x, y, i, ws, m) =
+    let y' = y + d
+    let s' = s + 1
+    if(i == 1) populate'(s', x, y', ws, m)
+    else pop_v'(s', d, x, y', i - 1, ws, m{[(x, y')] = s})
+
+  function cross_wire'(s, x, y, ws, m, acc) =
+    switch(ws)
+      [] => acc
+      (R(r) :: ws) => chk_h'(s, 1,  x, y, r, ws, m, acc)
+      (L(l) :: ws) => chk_h'(s, -1, x, y, l, ws, m, acc)
+      (U(u) :: ws) => chk_v'(s, 1,  x, y, u, ws, m, acc)
+      (D(d) :: ws) => chk_v'(s, -1, x, y, d, ws, m, acc)
+
+  function chk_h'(s, d, x, y, i, ws, m, acc) =
+    let x' = x + d
+    let s' = s + 1
+    if(i == 1) cross_wire'(s', x', y, ws, m, acc)
+    else switch(Map.lookup((x', y), m))
+            None     => chk_h'(s', d, x', y, i - 1, ws, m, acc)
+            Some(s1) => chk_h'(s', d, x', y, i - 1, ws, m, (s1 + s, (x', y)) :: acc)
+
+  function chk_v'(s, d, x, y, i, ws, m, acc) =
+    let y' = y + d
+    let s' = s + 1
+    if(i == 1) cross_wire'(s', x, y', ws, m, acc)
+    else switch(Map.lookup((x, y'), m))
+            None     => chk_v'(s', d, x, y', i - 1, ws, m, acc)
+            Some(s1) => chk_v'(s', d, x, y', i - 1, ws, m, (s1 + s, (x, y')) :: acc)
+
+  function abs(x) =
+    if(x < 0) -x
+    else       x
+
+  function min(cmp : ('a, 'a) => bool, xs : list('a)) =
+    switch(xs)
+      x :: xs => min'(cmp, x, xs)
+
+  function min'(cmp, x, xs) =
+    switch(xs)
+      [] => x
+      x' :: xs => if(cmp(x, x')) min'(cmp, x, xs)
+                  else           min'(cmp, x', xs)
+
+//   function test0() =
+//     [[R(8), U(5), L(5), D(3)],
+//      [U(7), R(6), D(4), L(4)]]
+
+//   function test1() =
+//     [[R(75), D(30), R(83), U(83), L(12), D(49), R(71), U(7), L(72)],
+//      [U(62), R(66), U(55), R(34), D(71), R(55), D(58), R(83)]]
+
+//   function test2() =
+//     [[R(98), U(47), R(26), D(63), R(33), U(87), L(62), D(20), R(33), U(53), R(51)],
+//      [U(98), R(91), D(20), R(16), D(67), R(40), U(7), R(15), U(6), R(7)]]
+
+  function input() =
+    [[R(1002), U(407), R(530), D(268), R(516), U(937), L(74), U(838), R(784), D(684),
+      L(912), U(746), R(189), U(192), R(868), D(345), L(972), D(492), R(942), U(631),
+      L(559), U(634), L(80), U(513), L(746), D(997), L(348), D(160), L(655), U(949),
+      R(717), U(396), R(549), D(167), R(591), U(469), L(22), U(977), L(167), D(856),
+      L(320), D(920), L(396), U(490), L(895), U(180), R(661), D(828), R(864), U(189),
+      R(307), U(402), R(409), U(445), L(101), D(418), R(812), U(419), R(319), U(75),
+      L(813), D(46), L(491), U(39), R(737), U(11), R(177), U(311), L(278), U(254),
+      R(475), U(166), L(515), D(105), L(694), D(437), L(298), U(169), L(613), D(234),
+      L(999), U(380), L(711), D(758), R(932), D(27), L(951), D(529), L(935), D(189),
+      R(816), D(176), R(98), D(320), R(965), D(333), L(367), U(622), R(18), U(83),
+      R(275), D(205), L(960), U(177), R(750), D(466), R(442), U(797), R(355), D(717),
+      L(569), D(578), R(384), U(863), R(541), U(405), R(527), D(658), L(514), U(168),
+      L(64), D(918), R(947), D(11), L(189), D(875), R(599), U(201), L(165), U(772),
+      L(679), U(566), L(195), U(660), R(896), D(622), R(678), U(390), L(984), D(900),
+      R(889), D(714), R(557), U(848), L(176), U(541), R(518), D(699), L(904), D(23),
+      L(55), D(886), L(206), D(621), L(48), D(197), R(502), D(259), L(779), D(72),
+      L(183), U(747), L(424), U(452), L(603), U(561), L(430), D(942), R(515), D(378),
+      R(962), U(508), R(230), D(650), R(804), D(453), R(899), D(813), R(484), U(798),
+      R(456), D(231), L(316), U(117), R(630), D(436), L(985), D(283), L(393), D(370),
+      R(158), U(957), L(914), D(455), L(875), U(536), R(889), U(400), R(347), U(712),
+      R(487), D(455), R(428), U(590), R(127), D(132), L(202), U(377), R(138), U(654),
+      L(760), D(46), R(213), D(225), L(817), U(455), L(612), U(543), L(525), U(979),
+      R(591), D(940), R(446), U(786), R(750), U(244), R(325), U(928), L(44), U(551),
+      L(955), U(221), L(986), U(516), L(916), D(242), L(280), D(71), R(80), U(849),
+      L(271), U(626), R(737), D(646), R(82), U(120), R(646), U(569), R(463), D(94),
+      R(570), U(456), L(548), D(687), R(221), D(759), L(606), D(818), L(859), U(218),
+      R(682), U(299), R(818), D(966), R(407), U(605), L(859), D(378), L(53), D(722),
+      L(216), D(221), R(639), U(485), L(865), D(620), R(99), D(988), R(944), D(323),
+      R(540), U(372), L(470), U(106), L(804), D(92), L(177), U(518), R(277), U(670),
+      R(451), D(194), L(695), D(502), L(601), U(596), R(374), U(682), L(19), D(54),
+      L(156)],
+     [L(1003), U(22), R(594), D(241), L(215), D(906), R(733), D(831), L(556), U(421),
+      L(780), D(242), R(183), U(311), R(46), D(52), R(124), D(950), L(18), U(985),
+      R(999), D(528), R(850), U(575), L(138), D(62), L(603), U(467), R(641), U(155),
+      L(165), D(63), L(489), U(4), R(635), D(460), L(446), D(938), R(983), U(494),
+      L(491), D(433), L(722), U(427), L(469), U(832), L(712), U(798), R(906), U(804),
+      R(646), U(721), R(578), D(194), L(726), U(803), L(985), D(934), R(943), U(198),
+      R(726), U(341), R(583), U(998), L(992), D(401), L(132), D(681), L(363), U(949),
+      L(814), D(977), R(840), D(145), L(177), D(291), L(652), D(396), R(330), D(951),
+      L(363), U(813), R(847), D(374), R(961), D(912), R(516), D(178), R(495), U(49),
+      R(340), D(395), R(632), D(991), R(487), D(263), R(320), D(948), R(456), D(142),
+      L(783), D(888), R(589), D(999), L(159), U(686), R(402), D(586), L(425), U(946),
+      R(56), D(979), L(534), U(313), R(657), D(401), L(666), D(504), R(712), D(232),
+      L(557), D(620), R(193), D(670), L(134), D(975), R(837), D(901), R(813), U(459),
+      L(499), U(450), L(87), U(84), L(582), U(310), R(795), D(280), L(730), D(458),
+      L(727), D(196), R(95), U(210), R(498), U(760), R(778), U(325), R(715), U(479),
+      R(275), U(557), L(450), D(196), L(60), U(115), R(475), D(265), L(611), D(372),
+      R(60), U(935), L(717), U(809), L(344), D(854), L(386), U(473), R(72), U(968),
+      L(816), U(900), R(866), U(172), R(965), U(383), R(576), D(774), R(753), U(788),
+      L(781), D(237), L(401), U(786), R(873), U(331), R(609), D(232), L(603), U(685),
+      L(494), U(177), L(982), D(173), L(673), U(772), L(7), U(7), R(517), U(573), R(212),
+      D(413), L(124), D(810), L(223), U(137), L(576), U(95), R(128), U(896), L(91),
+      U(932), L(875), U(917), R(106), U(911), L(208), D(507), L(778), D(59), L(71),
+      D(352), R(988), U(708), L(58), D(429), L(122), U(771), L(713), D(801), R(188),
+      U(661), R(752), D(374), R(312), D(848), L(504), D(540), R(334), U(517), R(343),
+      D(739), L(727), D(552), L(555), U(580), L(857), U(474), R(145), U(188), L(789),
+      U(698), R(735), U(131), L(494), U(162), L(27), D(849), L(140), D(849), R(615),
+      U(798), R(160), U(492), R(884), U(521), L(542), D(729), R(498), D(853), R(918),
+      U(565), R(65), U(32), L(607), U(552), L(38), D(822), L(77), U(490), L(190),
+      D(93), L(104), U(268), R(702), D(112), L(917), D(876), L(631), D(139), L(989),
+      U(810), R(329), U(253), L(498), D(767), L(550), U(666), L(549), U(616), R(376)]]

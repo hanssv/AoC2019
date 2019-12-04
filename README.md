@@ -24,6 +24,15 @@ after I had up:ed the gas limit (see below) and split the setup of the `Intcode`
 memory into setup and initialization it can be run in about 20 seconds on a normal laptop.
 (Consuming a measly 1503823113 of gas...)
 
+### [Day 3](03/sol_03.aes)
+
+The third problem was a grid puzzle. Two long and twisting wires should be analyzed for
+crossings. And the task was to return the crossing nearest to the starting point (and the
+crossing with shortest steps from the starting point in part 2). For efficiency reasons
+I decided to sacrifice compact code for repeating myself a bit. There is an overlap
+between part 1 and part 2, but the solution is basically repeated twice. In the end it
+solves the problem for my input in about 20 seconds.
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't even want to
 run them via contract calls etc. Instead we re-use part of the test framework in this way:
