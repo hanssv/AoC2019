@@ -60,8 +60,8 @@ opcodes.
 
 At the end I experimented a bit with various optimizations, and I noticed that
 more aggressive inlining sometimes made a difference. For example inlining all
-the calls to `val/3` saves 6.5% of the gas. Still todays problems would fit
-comfortabley within a microblock with 97k/117k gas for the part 1/part 2.
+the calls to `val/3` saves 6.5% of the gas. Still today's problems would fit
+comfortably within a microblock with 97k/117k gas for the part 1/part 2.
 
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
