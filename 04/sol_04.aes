@@ -1,4 +1,4 @@
-contract Day_4 =
+contract Day4 =
   entrypoint solve_1() =
     check_pwds(256310, 732736, check_pwd)
 

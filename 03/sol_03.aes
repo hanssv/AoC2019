@@ -1,5 +1,5 @@
 include "List.aes"
-contract Day_3 =
+contract Day3 =
   datatype wire = R(int) | U(int) | L(int) | D(int)
 
   entrypoint solve_1() =
