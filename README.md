@@ -49,6 +49,20 @@ of the properties (digits must be increasing) to skip over many integers at the
 same time. This improved the solution a lot, and it now even fits in a single
 block (5.7M gas) and runs in about half a second.
 
+### [Day 5](05/sol_05.aes)
+
+The [fifth problem](https://adventofcode.com/2019/day/5) marked the return of
+`Intcode` machine. Now it should be extended with immediate arguments, as well
+as input, output, jumps and conditionals. Not being very computationally
+expensive it was entirely straightforward to extend the solution from [Day
+2](#day-2) by adding plumbing for inputs and outputs and adding the new
+opcodes.
+
+At the end I experimented a bit with various optimizations, and I noticed that
+more aggressive inlining sometimes made a difference. For example inlining all
+the calls to `val/3` saves 6.5% of the gas. Still todays problems would fit
+comfortabley within a microblock with 97k/117k gas for the part 1/part 2.
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the
