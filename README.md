@@ -63,7 +63,7 @@ more aggressive inlining sometimes made a difference. For example inlining all
 the calls to `val/3` saves 6.5% of the gas. Still today's problems would fit
 comfortably within a microblock with 97k/117k gas for the part 1/part 2.
 
-### [Day_6](06/sol_06.aes)
+### [Day 6](06/sol_06.aes)
 
 The [sixth problem](https://adventofcode.com/2019/day/6) included a fairly
 simple graph/tree problem. In the first part you were supposed to find the
