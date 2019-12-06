@@ -63,6 +63,25 @@ more aggressive inlining sometimes made a difference. For example inlining all
 the calls to `val/3` saves 6.5% of the gas. Still today's problems would fit
 comfortably within a microblock with 97k/117k gas for the part 1/part 2.
 
+### [Day_6](06/sol_06.aes)
+
+The [sixth problem](https://adventofcode.com/2019/day/6) included a fairly
+simple graph/tree problem. In the first part you were supposed to find the
+total depth of all nodes in the tree and in the second part you had to find the
+common ancestor of two nodes and calculate the distance between them (through
+that common ancestor).
+
+This problem showed a shortcoming of Sophia, we are missing some functions on
+`string`, to handle the raw input data we would have needed `String.split`
+which is [not yet there](https://github.com/aeternity/aesophia/issues/176). So
+we did some preprocessing of the input data (you could do this and write it to
+the state, so not to much cheating I think).
+
+The naive implementation of part 1 became pretty expensive 3.5G gas and more
+than 15 seconds runtime, but after adding some memoization (using the state!)
+the solution actually fits in a block at 5.7M gas. Part 2 was a lot easier and
+only require 1.6M gas.
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the
