@@ -82,6 +82,17 @@ than 15 seconds runtime, but after adding some memoization (using the state!)
 the solution actually fits in a block at 5.7M gas. Part 2 was a lot easier and
 only require 1.6M gas.
 
+### [Day 7](07/sol_07.aes)
+
+The [seventh problem](https://adventofcode.com/2019/day/7) was yet another
+twist of the `Intcode` machine. This time we needed to handle multiple
+"processes" where output from one process was wired to input of another
+process. To achieve this I had to do a bit of refactoring since now execution
+of a program must be able to stop and wait for more input. The problem was more
+tedious than challenging - and in the end part 2 could be run in around 15
+seconds.
+
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the

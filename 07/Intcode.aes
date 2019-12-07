@@ -1,0 +1,97 @@
+namespace Intcode =
+  type pid = int
+  record process = { pc : int, mem : map(int, int), input : list(int),
+                     output : list(int), route : int, status : status }
+  datatype status  = Done | Wait | Run
+  type program = map(pid, process)
+
+  function run_prog(pids : list(pid), prog : program) =
+    let prog' = List.foldl(run_prog_step, prog, pids)
+    switch(route_data(pids, prog'))
+      (Done, prog) => prog
+      (Run,  prog) => run_prog(pids, prog)
+
+  function route_data(pids : list(pid), prog : program) =
+    switch(pids)
+      [] => (Run, prog)
+      pid :: pids =>
+        switch(route_data'(pid, prog))
+          (true, prog') => route_data(pids, prog')
+          (false, prog) => (Done, prog)
+
+  function route_data'(pid : pid, prog : program) =
+    let p = prog[pid]
+    switch(p.output)
+      [] => (true, prog)
+      xs =>
+        let q = prog[p.route]
+        switch(q.status)
+          Done => (false, prog)
+          Wait => (true, prog{ [pid] = p{output = []}, [p.route] = q{input = xs, status = Run} })
+
+  function run_prog_step(prog : program, pid : pid) =
+    let p = prog[pid]
+    switch(p.status)
+      Run  => prog{ [pid] = run_proc_step(p) }
+      _    => prog
+
+  function run_proc_step(proc : process) : process =
+    let mem = proc.mem
+    let pc  = proc.pc
+    let opcode = mem[pc]
+    let op = opcode mod 100
+    let i0 = (opcode / 100)   mod 10
+    let i1 = (opcode / 1000)  mod 10
+    // let i2 = (opcode / 10000) mod 10
+    switch(op)
+      99 => proc{status = Done}
+      1  => // Add
+        let x = val(pc + 1, i0, mem)
+        let y = val(pc + 2, i1, mem)
+        let z = mem[pc + 3]
+        run_proc_step(proc{pc = pc + 4, mem = mem{[z] = x + y}})
+      2  => // Mul
+        let x = val(pc + 1, i0, mem)
+        let y = val(pc + 2, i1, mem)
+        let z = mem[pc + 3]
+        run_proc_step(proc{pc = pc + 4, mem = mem{[z] = x * y}})
+      3  => // Input
+        let z = mem[pc + 1]
+        switch(proc.input)
+          in :: input => run_proc_step(proc{pc = pc + 2, mem = mem{[z] = in}, input = input})
+          []          => proc{status = Wait}
+      4  => // Output
+        let x = val(pc + 1, i0, mem)
+        run_proc_step(proc{pc = pc + 2, output = x :: proc.output})
+      5 => // Jump if non-zero
+        let x = val(pc + 1, i0, mem)
+        let y = val(pc + 2, i1, mem)
+        run_proc_step(proc{pc = if(x != 0) y else pc + 3})
+      6 => // Jump if zero
+        let x = val(pc + 1, i0, mem)
+        let y = val(pc + 2, i1, mem)
+        run_proc_step(proc{pc = if(x == 0) y else pc + 3})
+      7 => // Less than
+        let x = val(pc + 1, i0, mem)
+        let y = val(pc + 2, i1, mem)
+        let z = mem[pc + 3]
+        run_proc_step(proc{pc = pc + 4, mem = mem{[z] = if(x < y) 1 else 0}})
+      8 => // Equals than
+        let x = val(pc + 1, i0, mem)
+        let y = val(pc + 2, i1, mem)
+        let z = mem[pc + 3]
+        run_proc_step(proc{pc = pc + 4, mem = mem{[z] = if(x == y) 1 else 0}})
+      _  =>
+        abort(String.concat("Bad opcode: ", Int.to_str(opcode)))
+
+  function val(ix : int, mode : int, mem : map(int, int)) =
+    if(mode == 0) mem[mem[ix]]
+    else          mem[ix]
+
+  function setup_mem(is : list(int)) =
+    setup_mem'(0, is, {})
+
+  function setup_mem'(ix : int, xs : list(int), m : map(int, int)) =
+    switch(xs)
+      (x :: xs) => setup_mem'(ix + 1, xs, m{[ix] = x})
+      []        => m
