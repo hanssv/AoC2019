@@ -1,29 +1,35 @@
+include "List.aes"
 contract Day2 =
 
   entrypoint solve_1() =
     run(0, setup_and_init_mem(12, 2))
 
   entrypoint solve_2() =
-    let mem = setup_mem(0, input(), {})
-    solve_2'(mem, 0, 0)
+    let mem   = setup_mem(0, input(), {})
+    let range = List.from_to(0, 99)
+    let vals  = [ (x, y) | x <- range, y <- range ]
+    solve_2'(mem, vals)
 
-  function solve_2'(mem : map(int, int), n : int, v : int) =
-    let res = run(0, init_mem(n, v, mem))
-    if(res == 19690720) 100 * n + v
-    else
-      if(n == 99) solve_2'(mem, 0, v + 1)
-      else        solve_2'(mem, n + 1, v)
+  function solve_2'(mem : map(int, int), vals : list(int * int)) =
+    switch(vals)
+      (n, v) :: vals =>
+        let res = run(0, init_mem(n, v, mem))
+        if(res == 19690720) 100 * n + v
+        else                solve_2'(mem, vals)
 
   entrypoint run(pc : int, m : map(int, int)) =
     switch(m[pc])
       99 => m[0]
-      op =>
+      1  =>
         let x = m[pc + 1]
         let y = m[pc + 2]
         let z = m[pc + 3]
-        switch(op)
-          1 => run(pc + 4, m{[z] = m[x] + m[y]})
-          2 => run(pc + 4, m{[z] = m[x] * m[y]})
+        run(pc + 4, m{[z] = m[x] + m[y]})
+      2 =>
+        let x = m[pc + 1]
+        let y = m[pc + 2]
+        let z = m[pc + 3]
+        run(pc + 4, m{[z] = m[x] * m[y]})
 
   entrypoint setup_and_init_mem(noun : int, verb : int) =
     let mem = setup_mem(0, input(), {})
