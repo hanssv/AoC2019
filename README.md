@@ -155,6 +155,35 @@ Store: #{1 => #{}}
 {tuple,{2299406,[6,5,9,7,8]}}
 ```
 
+### [Day 8](08/sol_08.aes)
+
+The [eighth problem](https://adventofcode.com/2019/day/8) came down to turning
+a very large number (or a stream of digits, depending on your interpretation)
+into image layers. Part 1 was to produce a strange checksum and part 2 was to
+flatten the image layers, getting rid of transparent pixels.
+
+Normally you'd processed the input by turning it into a list of characters, but
+that doesn't really fly in Sophia. So instead I made use of the fact that we
+have unbound integers and represented the input as a huge number and produces
+the layers and individual pixels by `div` and `mod`. Not the most efficient,
+but a straightforward solution that ran in 2 and 6 seconds respectively for
+part 1 and 2. I was bit short on time, so this solution isn't very optimized,
+nor very elegant.
+
+```
+296> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/08/sol_08.aes", "solve_1", []).
+314569 steps / 44012413 gas / 78303937 reductions / 1567.86ms
+{tuple,{8,1792}}
+297> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/08/sol_08.aes", "solve_2", []).
+1142752 steps / 279521657 gas / 316914695 reductions / 6667.20ms
+[[1,0,0,0,0,0,0,1,1,0,1,1,1,1,0,0,1,1,0,0,1,0,0,1,0],
+ [1,0,0,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0,1,0,1,0,0,1,0],
+ [1,0,0,0,0,0,0,0,1,0,1,1,1,0,0,1,0,0,0,0,1,1,1,1,0],
+ [1,0,0,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0],
+ [1,0,0,0,0,1,0,0,1,0,1,0,0,0,0,1,0,0,1,0,1,0,0,1,0],
+ [1,1,1,1,0,0,1,1,0,0,1,1,1,1,0,0,1,1,0,0,1,0,0,1,0]]
+```
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the
