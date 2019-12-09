@@ -184,6 +184,29 @@ nor very elegant.
  [1,1,1,1,0,0,1,1,0,0,1,1,1,1,0,0,1,1,0,0,1,0,0,1,0]]
 ```
 
+### [Day 9](09/sol_09.aes)
+
+The [ninth problem](https://adventofcode.com/2019/day/9) was yet another twist
+to the `Intcode` machine. This time relative addressing was introduced, and I
+decided (since we didn't need more than one process) to build it on top of the
+solution from [Day 5](05/sol_05.aes). Implementation was entirely
+straightforward. Two complications that were mentioned in the problem
+descriptions, large numbers and memory addressing, was entirely trivial since
+we have large numbers built-in and were using a map for memory.
+
+Part 2 took a long time to run, around 2 minutes, but with inlining and some
+other tweaks (not part of the presented solution) it could be brought down to
+about one minute...
+
+```
+352> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/09/sol_09.aes", "solve_1", []).
+19006 steps / 249757 gas / 5034295 reductions / 101.50ms
+[2955820355]
+353> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/09/sol_09.aes", "solve_2", []).
+18660835 steps / 31690694258 gas / 5424189214 reductions / 121683.58ms
+[46643]
+```
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the
