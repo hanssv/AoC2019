@@ -207,6 +207,33 @@ about one minute...
 [46643]
 ```
 
+### [Day 10](10/sol_10.aes)
+
+The [tenth problem]((https://adventofcode.com/2019/day/10) was about line of
+sight in an asteroid field. In part 1 we were tasked to find the asteroid that
+had most asteroids in line of sight. Again we were handicapped by not having
+any string processing functions so I transformed the input into a list of list
+of 0's and 1's.
+
+The algorithm is nothing fancy, for each asteroid find the line of sight vector
+to each other asteroid (normalized) and then count the number of unique
+vectors. The problem had ~400 asteroids and this ran to completion in about 15
+seconds. In part 2 we were using a laser to blast the asteroids (laser rotating
+clockwise) and the task was to find which asteroid would be the 200th to be
+evaporated. The implementation actually computes the entire list in which order
+the asteroids are targeted, but since 200 is less than the answer to part 1 we
+could have gotten away with a less complex solution. This is quick to compute,
+less than half a second.
+
+```
+99> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/10/sol_10.aes", "solve_1", []).
+10125376 steps / 8232360098 gas / 425113858 reductions / 14420.50ms
+{tuple,{334,{tuple,{23,20}}}}
+100> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/10/sol_10.aes", "solve_2", []).
+309995 steps / 10060411 gas / 12705904 reductions / 371.74ms
+1119
+```
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the
