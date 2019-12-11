@@ -234,6 +234,31 @@ less than half a second.
 1119
 ```
 
+### [Day 11](11/sol_11.aes)
+
+The [eleventh problem]((https://adventofcode.com/2019/day/11) was yet another
+usage of the `Intcode` machine. This time though the problem was merely using
+it, so no changes necessary to that part. The task was to build a painting
+robot, that moved along an infinite grid, running an `Intcode` program for each
+square deciding on the color of the square and the direction to turn in. For
+part 1 you only had to count the number of squares that was painted but for
+part 2 we needed to display what was painted so some rudimentary string
+processing was done in Sophia!
+
+```
+220> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/11/sol_11.aes", "solve_1", []).
+5568706 steps / 4264437725 gas / 237784397 reductions / 6976.82ms
+2319
+221> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/11/sol_11.aes", "solve_2", []).
+747875 steps / 62233696 gas / 30851420 reductions / 636.95ms
+[<<" #  # #### ###  ###  ###  ####  ##    ##   ">>,
+ <<" #  # #    #  # #  # #  # #    #  #    #   ">>,
+ <<" #  # ###  #  # #  # #  # ###  #       #   ">>,
+ <<" #  # #    ###  ###  ###  #    # ##    #   ">>,
+ <<" #  # #    # #  #    # #  #    #  # #  #   ">>,
+ <<"  ##  #### #  # #    #  # #     ###  ##    ">>]
+```
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the
