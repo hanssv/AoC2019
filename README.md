@@ -236,7 +236,7 @@ less than half a second.
 
 ### [Day 11](11/sol_11.aes)
 
-The [eleventh problem]((https://adventofcode.com/2019/day/11) was yet another
+The [eleventh problem](https://adventofcode.com/2019/day/11) was yet another
 usage of the `Intcode` machine. This time though the problem was merely using
 it, so no changes necessary to that part. The task was to build a painting
 robot, that moved along an infinite grid, running an `Intcode` program for each
