@@ -259,6 +259,28 @@ processing was done in Sophia!
  <<"  ##  #### #  # #    #  # #     ###  ##    ">>]
 ```
 
+### [Day 12](12/sol_12.aes)
+
+The [twelfth problem](https://adventofcode.com/2019/day/12) was about tracking
+objects in 3D, though the physics was a bit simplistic. The naive solution
+(after some tweaking) worked ok for part 1. For part 2 a better algorithm was
+needed, but still the problem is expensive to solve in Sophia. I think it can
+be further optimized, however to get the runtime down to seconds will not be
+easily done.
+
+```
+16> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/12/sol_12.aes", "solve_1", []).
+0 steps / 174491485 gas / 0 reductions / 1993.96ms
+{tuple,{7471,
+        [{tuple,{{tuple,{-51,-12,-9}},{tuple,{6,8,-9}}}},
+         {tuple,{{tuple,{59,-6,-27}},{tuple,{6,1,4}}}},
+         {tuple,{{tuple,{21,-60,12}},{tuple,{-20,-9,-4}}}},
+         {tuple,{{tuple,{0,81,21}},{tuple,{8,0,9}}}}]}}
+20> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/12/sol_12.aes", "solve_2", []).
+0 steps / 1652188028015 gas / 0 reductions / 224605.71ms
+376243355967784
+```
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the
