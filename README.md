@@ -280,6 +280,25 @@ easily done.
 0 steps / 1652188028015 gas / 0 reductions / 224605.71ms
 376243355967784
 ```
+### [Day 13](13/sol_13.aes)
+
+The [thirteenth problem](https://adventofcode.com/2019/day/13) was a game,
+namely `Breakout` of course implemented in `Intcode`. Part 1 was simple, run
+the program and check the output (the game board). Second part was more fun,
+play the game, what is the winning score!? I first tried to do it
+interactively, but since you need somewhere around 4500 steps to finish the
+game the handling of state trees, etc. killed that approach. Instead I
+implemented a simple AI in Sophia and let it play the game to completion. This
+took around 90 seconds, but who is in a hurry :-)
+
+```
+8> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/13/sol_13.aes", "solve_1", []).
+0 steps / 108454225 gas / 0 reductions / 3164.72ms
+296
+9> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/13/sol_13.aes", "solve_2", []).
+0 steps / 87460100420 gas / 0 reductions / 92794.62ms
+{tuple,{16,16,16,13824}}
+```
 
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
