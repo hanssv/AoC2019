@@ -300,6 +300,27 @@ took around 90 seconds, but who is in a hurry :-)
 {tuple,{16,16,16,13824}}
 ```
 
+### [Day 14](14/sol_14.aes)
+
+The [fourteenth problem](https://adventofcode.com/2019/day/14) was about chains
+of "chemical" reactions to create rocket fuel. The main complication was to
+keep track of surplus material when reactions where not one-to-one. The task
+was to find out how much ore was required to make 1 unit of fuel. For part 2
+the problem was reversed, given X ore how much fuel could be produced. Due to
+the surplus material it isn't linear, and the best way to approach it was to
+implement a binary search over the solution to part 1. I.e. find the amount of
+fuel that would require just below X ore. With some small optimizations (only
+traverse lists once, etc.) it ran to completion in about 10 seconds.
+
+```
+59> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/14/sol_14.aes", "solve_1", []).
+0 steps / 762793 gas / 0 reductions / 140.31ms
+598038
+60> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/14/sol_14.aes", "solve_2", []).
+0 steps / 1343915935 gas / 0 reductions / 10722.23ms
+2269325
+```
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the

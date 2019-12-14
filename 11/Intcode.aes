@@ -1,3 +1,4 @@
+include "List.aes"
 namespace Intcode =
   type pid = int
   record process = { pc : int, mem : map(int, int), input : list(int), rel : int,
