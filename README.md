@@ -321,6 +321,25 @@ traverse lists once, etc.) it ran to completion in about 10 seconds.
 2269325
 ```
 
+### [Day 15](15/sol_15.aes)
+
+The [fifteenth problem](https://adventofcode.com/2019/day/15) was a maze
+puzzle. In part 1 you should discover the maze, and find the shortest path to
+an object in the maze. In part 2 you should find the point in the maze with the
+largest distance to another point. Both problems can be solved in a similar
+way: 1) discover the maze, 2) do a breadth-first search over the maze from the
+point of interest. This is overkill for part 1, but accidentally I solved part
+1 like this (thinking I could optimize later) and that made part 2 trivial!
+
+```
+19> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/15/sol_15.aes", "solve_1", []).
+0 steps / 1126122416 gas / 0 reductions / 10622.11ms
+212
+20> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/15/sol_15.aes", "solve_2", []).
+0 steps / 1397698224 gas / 0 reductions / 11854.60ms
+{tuple,{{tuple,{18,0}},358}}
+```
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the
