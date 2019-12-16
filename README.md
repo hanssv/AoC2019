@@ -340,6 +340,34 @@ point of interest. This is overkill for part 1, but accidentally I solved part
 {tuple,{{tuple,{18,0}},358}}
 ```
 
+### [Day 16](16/sol_16.aes)
+
+The [sixteenth problem](https://adventofcode.com/2019/day/16) problem was about
+flawed frequency transmission. We were tasked with cleaning up a signal (a list
+of digits 650 long) where each digit had its own filter and where all filters
+should be run 100 times. This translates into a tight loop over a couple of
+vectors (or in our case a map). In retrospect this is perhaps the kind of
+problem where the disadvantage of being in a VM (optimized for block chain
+operations) will be clearly visible. After being at least somewhat clever part
+1 of the problem could be solved in about 5 minutes...
+
+Enter part 2, now the signal isn't 650 digits, it is 65000000 digits... But
+since we are tasked with finding a chunk of the resulting signal towards the
+end (in our case at 5976732) of the signal we could simplify the list of
+filters (they all degenerate to the same filter). Armed with this we managed to
+(after optimizing in several steps) get the runtime down to a measly 2300
+seconds...
+
+```
+40> f(M), M = aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/16/sol_16.aes", "solve_1", []).
+0 steps / 370908898489 gas / 0 reductions / 282643.28ms
+[7,4,3,6,9,0,3,3]
+41> f(M), M = aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/16/sol_16.aes", "solve_2", [100]).
+0 steps / 164673100419882 gas / 0 reductions / 2296406.90ms
+[1,9,9,0,3,8,6,4]
+```
+
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the

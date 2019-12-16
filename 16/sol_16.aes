@@ -1,0 +1,119 @@
+include "List.aes"
+contract Day16 =
+
+  record pattern = { add : list(int), sub : list(int) }
+
+  entrypoint solve_1() =
+    let data = Map.from_list(List.enumerate(input()))
+    let size = Map.size(data)
+    let ps   = [(i - 1, mk_pattern(i, size)) | i <- [1..size]]
+    let data' = fft(100, data, ps)
+    [ data'[i] | i <- [0..7] ]
+
+  entrypoint solve_2(k) =
+    let data = input()
+    let size = List.length(data)
+    let ix = List.take(7, data)
+    let ds0 = mk_ds0(mk_num(0, ix), size, 10000, data)
+    List.take(8, foo(k, ds0))
+
+  function mk_ds0(offset, len, k, data) =
+    let take = len - offset mod len
+    let j = k - (offset / len) - 1
+    let rdata = List.reverse(data)
+    List.flatten([ rdata | _ <- [1..j] ]) ++ List.take(take, rdata)
+
+  function mk_num(acc, xs) =
+    switch(xs)
+      [] => acc
+      x :: xs => mk_num(acc * 10 + x, xs)
+
+  function foo(k, d0s) =
+    switch(d0s)
+      d0 :: d0s =>
+        let ds = [ d0 | _ <- [1..k] ]
+        bar(d0s, ds, [d0])
+
+  function bar(d0s, ds, res) =
+    switch(d0s)
+      [] => res
+      d0 :: d0s =>
+        switch(dstep(d0, ds))
+          (d, ds') => bar(d0s, ds', d :: res)
+
+  function dstep(d0, ds) =
+    switch(ds)
+      [] => (d0, [])
+      d :: ds =>
+        let d' = (d0 + d) mod 10
+        switch(dstep(d', ds))
+          (dx, ds) => (dx, d' :: ds)
+
+  function fft(n, data, ps) =
+    if(n == 0) data
+    else fft(n - 1, phase(data, ps, {}), ps)
+
+  function phase(data, ps, new_data) =
+    switch(ps)
+      [] => new_data
+      (i, p) :: ps =>
+        phase(data, ps, new_data{[i] = apply_pat(p, data)})
+
+  function apply_pat(p, data) =
+    let n = sum(p.add, data, 0) - sum(p.sub, data, 0)
+    let abs(a) = if(a < 0) -a else a
+    abs(n) mod 10
+
+  function sum(ixs, data, n) =
+    switch(ixs)
+      [] => n
+      ix :: ixs => sum(ixs, data, n + data[ix])
+
+  // 0^i-1 1^i 0^i -1^i 0^i ...
+  entrypoint mk_pattern(i, n) =
+    { add = chunks(i - 1, i, 4 * i, n),
+      sub = chunks(3 * i - 1, i, 4 * i, n) }
+
+  function chunks(start, len, step, stop) =
+    if(start >= stop) []
+    else
+      let min(a, b) = if(a < b) a else b
+      let cstop = min(stop - 1, start + len - 1)
+      [start..cstop] ++ chunks(start + step, len, step, stop)
+
+  function input0() =
+    [1, 2, 3, 4, 5, 6, 7, 8]
+
+  function input1() =
+    [8, 0, 8, 7, 1, 2, 2, 4, 5, 8, 5, 9, 1, 4, 5, 4, 6, 6, 1, 9, 0, 8, 3, 2, 1, 8, 6, 4, 5, 5, 9, 5]
+
+  function input2() =
+    [0, 3, 0, 3, 6, 7, 3, 2, 5, 7, 7, 2, 1, 2, 9, 4, 4, 0, 6, 3, 4, 9, 1, 5, 6, 5, 4, 7, 4, 6, 6, 4]
+
+  function input() =
+    [5, 9, 7, 6, 7, 3, 3, 2, 8, 9, 3, 7, 1, 2, 4, 9, 9, 3, 0, 3, 5, 0, 7, 9, 2,
+     7, 3, 9, 2, 4, 9, 2, 7, 9, 9, 8, 4, 2, 2, 8, 0, 9, 4, 9, 0, 3, 2, 6, 4, 7,
+     4, 4, 7, 9, 4, 3, 7, 0, 8, 1, 2, 8, 1, 3, 4, 7, 5, 9, 8, 2, 9, 6, 2, 3, 4,
+     3, 2, 9, 7, 9, 6, 6, 5, 6, 3, 8, 6, 2, 7, 7, 4, 8, 8, 2, 8, 7, 6, 9, 9, 0,
+     1, 4, 5, 9, 9, 2, 0, 3, 3, 1, 8, 0, 9, 3, 2, 4, 2, 7, 7, 2, 5, 7, 7, 8, 3,
+     5, 5, 9, 9, 8, 0, 6, 8, 2, 7, 7, 3, 0, 0, 5, 0, 9, 0, 8, 1, 2, 0, 1, 5, 1,
+     9, 4, 7, 0, 5, 6, 7, 8, 0, 4, 4, 4, 9, 4, 4, 2, 7, 6, 5, 6, 6, 9, 4, 4, 5,
+     0, 6, 8, 3, 4, 7, 0, 8, 9, 4, 2, 0, 4, 4, 5, 8, 3, 2, 2, 5, 1, 2, 6, 8, 5,
+     4, 6, 3, 1, 0, 8, 6, 7, 7, 2, 9, 7, 9, 3, 1, 4, 7, 5, 2, 2, 4, 6, 4, 4, 1,
+     2, 0, 0, 8, 8, 0, 4, 4, 2, 4, 1, 5, 1, 4, 9, 8, 4, 5, 0, 1, 8, 0, 1, 0, 5,
+     5, 7, 7, 6, 6, 2, 1, 4, 5, 9, 0, 0, 6, 3, 0, 6, 3, 5, 5, 1, 9, 1, 1, 7, 3,
+     8, 3, 8, 0, 2, 8, 8, 1, 8, 5, 4, 1, 8, 5, 2, 4, 7, 2, 7, 6, 6, 5, 3, 1, 6,
+     9, 1, 4, 4, 7, 7, 1, 6, 6, 9, 9, 9, 2, 9, 3, 6, 9, 2, 5, 4, 3, 6, 7, 5, 9,
+     0, 6, 5, 7, 4, 3, 4, 0, 0, 9, 4, 4, 6, 8, 5, 2, 4, 4, 6, 3, 8, 2, 9, 1, 3,
+     2, 9, 9, 0, 3, 0, 9, 8, 5, 0, 2, 3, 2, 5, 2, 0, 8, 5, 1, 9, 2, 3, 9, 6, 7,
+     6, 3, 1, 6, 8, 2, 8, 8, 9, 4, 3, 6, 9, 6, 8, 6, 8, 0, 4, 4, 5, 4, 3, 2, 7,
+     5, 2, 4, 4, 5, 8, 4, 8, 3, 4, 4, 9, 5, 7, 6, 2, 1, 8, 2, 3, 3, 3, 6, 9, 6,
+     2, 8, 7, 3, 0, 6, 0, 0, 0, 8, 7, 9, 3, 0, 5, 7, 6, 0, 0, 2, 8, 7, 1, 6, 5,
+     8, 4, 6, 5, 9, 1, 8, 8, 5, 1, 1, 0, 3, 6, 1, 3, 4, 9, 0, 5, 9, 3, 5, 0, 9,
+     0, 2, 8, 4, 4, 0, 4, 0, 4, 4, 0, 6, 5, 5, 5, 1, 0, 5, 4, 8, 2, 1, 9, 2, 0,
+     6, 9, 6, 7, 4, 9, 8, 2, 2, 6, 2, 8, 9, 9, 8, 7, 7, 6, 5, 3, 5, 5, 8, 0, 6,
+     8, 5, 2, 0, 8, 3, 5, 0, 6, 7, 2, 3, 7, 1, 5, 4, 5, 8, 1, 2, 2, 9, 2, 7, 7,
+     6, 9, 1, 0, 2, 0, 8, 4, 6, 2, 1, 2, 8, 0, 0, 8, 2, 1, 6, 2, 8, 2, 2, 1, 0,
+     4, 3, 4, 6, 6, 6, 8, 2, 2, 6, 9, 0, 6, 0, 3, 3, 7, 0, 1, 5, 1, 2, 9, 1, 2,
+     1, 9, 8, 9, 5, 2, 0, 9, 3, 1, 2, 6, 8, 6, 9, 3, 9, 2, 4, 2, 8, 5, 4, 2, 9,
+     5, 4, 9, 7, 4, 5, 7, 7, 6, 9, 4, 0, 8, 8, 6, 9, 2, 1, 0, 6, 8, 6, 2, 4, 6]
