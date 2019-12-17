@@ -367,6 +367,38 @@ seconds...
 [1,9,9,0,3,8,6,4]
 ```
 
+### [Day 17](17/sol_17.aes)
+
+The [seventeenth problem](https://adventofcode.com/2019/day/17) problem was
+(there is an every second day pattern...) another `Intcode` problem. The task
+was to explore a maze (or a bunch of scaffolding), in part 1 we should compute
+a sum of all coordinates that was an intersection - entirely straightforward.
+
+Part 2 was about providing a program to a small robot that should visit all of
+the maze, the caveat was that there was only a limited amount of space for the
+program (including sub-routines). Because of the construction of the maze it
+was, however, easy to write a navigation function that visited all of the maze,
+and then break the resulting trace up into suitable sub-routines. I ended up
+only solving this for my input, not the general case. No problems with run-time
+today.
+
+```
+122> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/17/sol_17.aes", "setup", []).
+0 steps / 265526634 gas / 0 reductions / 5207.16ms
+Store:
+  #{1 =>
+        {tuple,{#{{tuple,{16,22}} => {tuple,{}},
+                  {tuple,{14,13}} => {tuple,{}},
+                  ...},
+                {tuple,{6,0}}}}}
+{tuple,{}}
+123> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/17/sol_17.aes", "solve_1", []).
+0 steps / 71673 gas / 0 reductions / 24.34ms
+5788
+124> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/17/sol_17.aes", "solve_2", []).
+0 steps / 1199125790 gas / 0 reductions / 11443.52ms
+648545
+```
 
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
