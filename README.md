@@ -412,6 +412,24 @@ to run in Sophia :-(
 So temporarily I admit defeat, but I haven't given up entirely yet... I think
 it can be done.
 
+### [Day 19](19/sol_19.aes)
+
+The [nineteenth problem](https://adventofcode.com/2019/day/19) problem was
+about an `Intcode` program (of course). The program described a beam in 2D
+space. For part 1 you had to run the program 2500 times (or you could be
+clever, but since this was entirely feasible in minutes, why bother!). For part
+2 you had to trace the outline of the beam but again nice and easy compared to
+yesterday!
+
+```
+64> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/19/sol_19.aes", "solve_1", []).
+0 steps / 175755223649 gas / 0 reductions / 130745.37ms
+141
+65> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/19/sol_19.aes", "solve_2", []).
+0 steps / 53045376977 gas / 0 reductions / 106968.82ms
+{tuple,{1564,1348,15641348}}
+```
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the
