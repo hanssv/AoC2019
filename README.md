@@ -400,6 +400,18 @@ Store:
 648545
 ```
 
+### [Day 18](18/sol_18.aes)
+
+The [eighteenth problem](https://adventofcode.com/2019/day/18) problem was a
+shortest path finding problem in a maze with locked doors. This makes a really
+tricky problem, since the possible paths keeps changing once you make your way
+through the maze. I managed to solve the problem, using Erlang, but that
+solution has to be improved by an order of magnitude (or two!) to be feasible
+to run in Sophia :-(
+
+So temporarily I admit defeat, but I haven't given up entirely yet... I think
+it can be done.
+
 ## Running contracts
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the
