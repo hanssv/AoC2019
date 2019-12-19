@@ -409,8 +409,43 @@ through the maze. I managed to solve the problem, using Erlang, but that
 solution has to be improved by an order of magnitude (or two!) to be feasible
 to run in Sophia :-(
 
-So temporarily I admit defeat, but I haven't given up entirely yet... I think
-it can be done.
+~~So temporarily I admit defeat, but I haven't given up entirely yet... I think
+it can be done.~~ Yes, it could be done. Re-working the algorithm to
+pre-compute a graph of possible moves, a clever heap implementation for the
+shortest path algorithm and using bit-vectors to represent the list of keys all
+together makes this runnable in Sophia. The credit for this cleverness goes to
+[Ulf](https://github.com/UlfNorell)!
+
+```
+82> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/18/sol_18.aes", "setup_1", []).
+0 steps / 300095817507 gas / 0 reductions / 156651.49ms
+Store:
+  #{1 =>
+        #{0 =>
+              [{tuple,{5,162,{bits,0},{bits,4210944}}},
+               {tuple,{9,330,{bits,69206016},{bits,526356}}},
+               ...
+{tuple,{}}
+83> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/18/sol_18.aes", "solve_1", []).
+0 steps / 25350509087 gas / 0 reductions / 298800.33ms
+{tuple,{[22,14,8,7,25,17,5,1,2,11,26,21,15,20,4,19,16,23,9,
+         10,6,3,24,12,18,13],
+        4520}}
+85> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/18/sol_18.aes", "setup_2", []).
+0 steps / 7874835496 gas / 0 reductions / 22853.58ms
+Store:
+  #{1 =>
+        #{-3 =>
+              [{tuple,{9,328,{bits,69206016},{bits,526356}}},
+               {tuple,{16,346,{bits,69206016},{bits,526340}}},
+               ...
+{tuple,{}}
+86> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/18/sol_18.aes", "solve_2", []).
+0 steps / 69303116775 gas / 0 reductions / 389509.87ms
+{tuple,{[11,24,26,8,22,14,1,2,21,3,15,5,7,17,25,6,20,19,16,
+         4,9,23,10,12,18,13],
+        1540}}
+```
 
 ### [Day 19](19/sol_19.aes)
 
