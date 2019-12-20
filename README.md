@@ -465,7 +465,25 @@ yesterday!
 {tuple,{1564,1348,15641348}}
 ```
 
+### [Day 20](20/sol_20.aes)
+
+The [twentieth problem](https://adventofcode.com/2019/day/20) problem was yet
+another maze. Part of the problem was to parse the input, but since we still
+lack some string functions in Sophia we did some pre-processing. Once in place
+part 1 was a simple breadth-first search. Part 2 was a bit more tricky, where
+we were to visit several instances of the maze.
+
+```
+19> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/20/sol_20.aes", "solve_1", []).
+0 steps / 218213962 gas / 0 reductions / 1425.99ms
+654
+22> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/20/sol_20.aes", "solve_2", []).
+0 steps / 140855720130 gas / 0 reductions / 36148.79ms
+7360
+```
+
 ## Running contracts
+
 For obvious reasons I don't want to run these contracts on-chain, and I don't
 even want to run them via contract calls etc. Instead we re-use part of the
 test framework in this way:
