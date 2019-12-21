@@ -342,7 +342,7 @@ point of interest. This is overkill for part 1, but accidentally I solved part
 
 ### [Day 16](16/sol_16.aes)
 
-The [sixteenth problem](https://adventofcode.com/2019/day/16) problem was about
+The [sixteenth problem](https://adventofcode.com/2019/day/16) was about
 flawed frequency transmission. We were tasked with cleaning up a signal (a list
 of digits 650 long) where each digit had its own filter and where all filters
 should be run 100 times. This translates into a tight loop over a couple of
@@ -369,7 +369,7 @@ seconds...
 
 ### [Day 17](17/sol_17.aes)
 
-The [seventeenth problem](https://adventofcode.com/2019/day/17) problem was
+The [seventeenth problem](https://adventofcode.com/2019/day/17) was
 (there is an every second day pattern...) another `Intcode` problem. The task
 was to explore a maze (or a bunch of scaffolding), in part 1 we should compute
 a sum of all coordinates that was an intersection - entirely straightforward.
@@ -402,7 +402,7 @@ Store:
 
 ### [Day 18](18/sol_18.aes)
 
-The [eighteenth problem](https://adventofcode.com/2019/day/18) problem was a
+The [eighteenth problem](https://adventofcode.com/2019/day/18) was a
 shortest path finding problem in a maze with locked doors. This makes a really
 tricky problem, since the possible paths keeps changing once you make your way
 through the maze. I managed to solve the problem, using Erlang, but that
@@ -449,7 +449,7 @@ Store:
 
 ### [Day 19](19/sol_19.aes)
 
-The [nineteenth problem](https://adventofcode.com/2019/day/19) problem was
+The [nineteenth problem](https://adventofcode.com/2019/day/19) was
 about an `Intcode` program (of course). The program described a beam in 2D
 space. For part 1 you had to run the program 2500 times (or you could be
 clever, but since this was entirely feasible in minutes, why bother!). For part
@@ -467,11 +467,11 @@ yesterday!
 
 ### [Day 20](20/sol_20.aes)
 
-The [twentieth problem](https://adventofcode.com/2019/day/20) problem was yet
-another maze. Part of the problem was to parse the input, but since we still
-lack some string functions in Sophia we did some pre-processing. Once in place
-part 1 was a simple breadth-first search. Part 2 was a bit more tricky, where
-we were to visit several instances of the maze.
+The [twentieth problem](https://adventofcode.com/2019/day/20) was yet another
+maze. Part of the problem was to parse the input, but since we still lack some
+string functions in Sophia we did some pre-processing. Once in place part 1 was
+a simple breadth-first search. Part 2 was a bit more tricky, where we were to
+visit several instances of the maze.
 
 ```
 19> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/20/sol_20.aes", "solve_1", []).
@@ -480,6 +480,24 @@ we were to visit several instances of the maze.
 22> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/20/sol_20.aes", "solve_2", []).
 0 steps / 140855720130 gas / 0 reductions / 36148.79ms
 7360
+```
+
+### [Day 21](21/sol_21.aes)
+
+The [twenty-first problem](https://adventofcode.com/2019/day/21) was about
+writing a little bit of assembly-like code to solve a puzzle. Nothing
+algorithmic but instead a straight-forward puzzle. Part 1 was quite easy. The
+twist for part 2 made it a bit harder but not overly so. Run-time in Sophia was
+a few seconds for part 1 and a minute and a half for part 2. The Sophia
+`Intcode` interpreter isn't super-fast...
+
+```
+43> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/21/sol_21.aes", "solve_1", []).
+0 steps / 173980099 gas / 0 reductions / 4115.54ms
+19354083
+44> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/21/sol_21.aes", "solve_2", []).
+0 steps / 86713494597 gas / 0 reductions / 96768.97ms
+1143499964
 ```
 
 ## Running contracts
