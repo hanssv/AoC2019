@@ -500,6 +500,34 @@ a few seconds for part 1 and a minute and a half for part 2. The Sophia
 1143499964
 ```
 
+### [Day 22](22/sol_22.aes)
+
+The [twenty-second problem](https://adventofcode.com/2019/day/22) was about
+shuffling a (huge) deck of cards. For part 1 you could get away with a naive
+implementation that actually did handle the deck of cards. But the run-time was
+not impressive (minutes in Sophia). To optimize you should figure out that the
+solution only asks for a single card (and hence a single index) in the deck. So
+we can transform the problem to only track one index at a time.
+
+For part 2 where the deck isn't huge but enormous (containing around 10^14
+cards) this is crucial, and we should also perform the shuffling no less than
+101741582076661 times. I.e. no naive solution will cut it. The key observation
+to make is that all different shuffle techniques are linear, i.e. we turn the
+sequence of shuffle-steps into a single function `ax + b = y`. So the problem
+reduces to finding `a` and `b` and then apply it to `101741582076661`. And all
+of this should be done modulo the deck size (a large prime). Lots of things to
+get wrong, but once the bits fall into place the code turns out nicely and it
+runs quickly.
+
+```
+53> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/22/sol_22.aes", "solve_1", []).
+0 steps / 22218 gas / 0 reductions / 7.65ms
+7860
+54> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/22/sol_22.aes", "solve_2", []).
+0 steps / 205431 gas / 0 reductions / 43.75ms
+61256063148970
+```
+
 ## Running contracts
 
 For obvious reasons I don't want to run these contracts on-chain, and I don't

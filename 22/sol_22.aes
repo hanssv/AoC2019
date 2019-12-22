@@ -1,0 +1,78 @@
+include "List.aes"
+contract Day22 =
+  datatype technique = DealNew | Cut(int) | Deal(int)
+
+  entrypoint solve_1() =
+    let size = 10007
+    let ix   = 2019
+
+    deal_ix(size, ix, input())
+
+  // Compute which index goes where for a sequence of techniques
+  function deal_ix(deck_size : int, ix : int, ts : list(technique)) =
+    let d_ix(i, c) =
+          switch(c)
+            DealNew => deck_size - 1 - i
+            Cut(x)  => (deck_size + i - x) mod deck_size
+            Deal(x) => (i * x) mod deck_size
+    List.foldl(d_ix, ix, ts)
+
+  entrypoint solve_2() =
+    let p = 119315717514047
+    let n = 101741582076661
+    let cmds = List.reverse(input())
+
+    let x = 2020
+    let y = rev_deal_ix(p, x, cmds)
+    let z = rev_deal_ix(p, y, cmds)
+
+    let a = ((y - z) * mod_inv(p + x - y, p)) mod p
+    let b = (y - a * x) mod p
+
+    let pan = pow_mod(a, n, p)
+    (p + (pan * x + (pan - 1) * mod_inv(a - 1, p) * b) mod p) mod p
+
+  // Compute in reverse which index goes where for a sequence of techniques
+  function rev_deal_ix(deck_size : int, ix : int, ts : list(technique)) =
+    let r_d_ix(i, c) =
+          switch(c)
+            DealNew => deck_size - 1 - i
+            Cut(x)  => (deck_size + i + x) mod deck_size
+            Deal(x) => (i * mod_inv(x, deck_size)) mod deck_size
+    List.foldl(r_d_ix, ix, ts)
+
+  function mod_inv(a : int, b : int) =
+    switch(gcd_ext(a, b))
+      (_, x, _) => (b + x mod b) mod b
+
+  function gcd_ext(a, b) =
+    if(a == 0) (b, 0, 1)
+    else
+      switch(gcd_ext(b mod a, a))
+        (g, x, y) => (g, y - (b / a) * x, x)
+
+  function pow_mod(a, b, p) =
+    pow_mod'(a, b, p, 1)
+
+  function pow_mod'(a, b, p, r) =
+    if(b == 0)         r
+    elif(b mod 2 == 0) pow_mod'((a * a) mod p, b / 2, p, r)
+    else               pow_mod'((a * a) mod p, b / 2, p, (r * a) mod p)
+
+  function input0() =
+    [DealNew, Cut(-2), Deal(7), Cut(8), Cut(-4), Deal(7), Cut(3), Deal(9), Deal(3), Cut(-1)]
+
+  function input() =
+    [Deal(31), DealNew, Cut(-7558), Deal(49), Cut(194), Deal(23), Cut(-4891), Deal(53),
+     Cut(5938), Deal(61), Cut(7454), DealNew, Deal(31), Cut(3138), Deal(53), Cut(3553),
+     Deal(61), Cut(-5824), Deal(42), Cut(-889), Deal(34), Cut(7128), Deal(42), Cut(-9003),
+     Deal(75), Cut(13), Deal(75), Cut(-3065), Deal(74), Cut(-8156), Deal(39), Cut(4242),
+     Deal(24), Cut(-405), Deal(27), Cut(6273), Deal(19), Cut(-9826), Deal(58), DealNew,
+     Cut(-6927), Deal(65), Cut(-9906), Deal(31), DealNew, Deal(42), DealNew, Deal(39),
+     Cut(-4271), DealNew, Deal(32), Cut(-8799), Deal(69), Cut(2277), Deal(55), Cut(2871),
+     Deal(54), Cut(-2118), Deal(15), Cut(1529), Deal(57), Cut(-4745), Deal(23), Cut(-5959),
+     Deal(58), DealNew, Deal(48), DealNew, Cut(2501), DealNew, Deal(42), DealNew,
+     Cut(831), Deal(74), Cut(-3119), Deal(33), Cut(967), Deal(69), Cut(9191), Deal(9),
+     Cut(5489), Deal(62), Cut(-9107), Deal(14), Cut(-7717), Deal(56), Cut(7900), Deal(49),
+     Cut(631), Deal(14), DealNew, Deal(58), Cut(-9978), Deal(48), DealNew, Deal(66),
+     Cut(-1554), DealNew, Cut(897), Deal(36)]
