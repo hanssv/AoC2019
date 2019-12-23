@@ -528,6 +528,26 @@ runs quickly.
 61256063148970
 ```
 
+### [Day 23](23/sol_23.aes)
+
+The [twenty-third problem](https://adventofcode.com/2019/day/23) was about
+running NICs (in `Intcode`) and simulate a network. Part 1 was quick, just
+create 50 `Intcode` processes and then take care of routing messages. Finally,
+abort once a packet is sent to the NAT controller (address 255).
+
+For part 2 we should also detect idleness in the network, I didn't do anything
+fancy just once a full cycle without a packet occurs, decide the network is
+idle. Keep track of NAT messages and halt once it cycles.
+
+```
+7>  aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/23/sol_23.aes", "solve_1", []).
+0 steps / 32864407 gas / 0 reductions / 1562.02ms
+{revert,<<"Addr 255 is not routeable: (47969,17283)">>}
+8>  aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/23/sol_23.aes", "solve_2", []).
+0 steps / 8909324928 gas / 0 reductions / 29257.81ms
+11319
+```
+
 ## Running contracts
 
 For obvious reasons I don't want to run these contracts on-chain, and I don't
