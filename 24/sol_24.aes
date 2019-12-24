@@ -1,0 +1,138 @@
+include "List.aes"
+include "Pair.aes"
+contract Day24 =
+
+  type set('a) = map('a, unit)
+  record game = { size : int, bd : bits }
+
+  entrypoint solve_1() =
+    let b = mk_board(board())
+    solve(b, {})
+
+  function mk_board(board : list(list(int))) =
+    let ss(d) = if(d == 0) [] else [d]
+    List.foldl(Bits.set, Bits.none,
+               [ Pair.fst(xs) + Pair.fst(ys) * 5 | ys <- List.enumerate(board),
+                                                   xs <- List.enumerate(Pair.snd(ys)),
+                                                   s  <- ss(Pair.snd(xs)) ])
+
+  function solve(b, m : set(bits)) =
+    if(Map.member(b, m)) b
+    else                 solve(step(b), m{[b] = ()})
+
+  function step(b) =
+    step'(b, 0, 0, Bits.none)
+
+  function step'(b, x, y, next) =
+    if(y == 5)   next
+    elif(x == 5) step'(b, 0, y + 1, next)
+    else
+      let a = adjacent(b, x, y)
+      let ix = x + y * 5
+      if(Bits.test(b, ix) && a != 1)
+        step'(b, x + 1, y, next)
+      elif(!Bits.test(b, ix) && (a == 1 || a == 2))
+        step'(b, x + 1, y, Bits.set(next, ix))
+      elif(Bits.test(b, ix))
+        step'(b, x + 1, y, Bits.set(next, ix))
+      else
+        step'(b, x + 1, y, next)
+
+  function adjacent(b, x, y) =
+    let ix(x, y) = x + y * 5
+    let a = if(x > 0 && Bits.test(b, ix(x - 1, y))) 1 else 0
+    let a = if(x < 4 && Bits.test(b, ix(x + 1, y))) a + 1 else a
+    let a = if(y > 0 && Bits.test(b, ix(x, y - 1))) a + 1 else a
+    if(y < 4 && Bits.test(b, ix(x, y + 1))) a + 1 else a
+
+  entrypoint solve_2(n) =
+    let b = mk_board2(board())
+    // b
+    Map.size(solve'(n, 0, b))
+    // adjacent2(b, -1, 3, 2)
+
+  function solve'(n, l, b) =
+    if(n == 0) b
+    else solve'(n - 1, l + 1, step2(l + 1, b))
+
+  function step2(l, b) =
+    step2'(b, -l, l, 0, 0, {})
+
+  function step2'(b, l, lmax, x, y, next : map(int * int * int, unit)) =
+    if(l > lmax)           next
+    elif(y == 5)           step2'(b, l + 1, lmax, 0, 0, next)
+    elif(x == 5)           step2'(b, l, lmax, 0, y + 1, next)
+    elif(x == 2 && y == 2) step2'(b, l, lmax, 3, 2, next)
+    else
+      let a = adjacent2(b, l, x, y)
+      let ix = (l, x, y)
+      if(Map.member(ix, b) && a != 1)
+        step2'(b, l, lmax, x + 1, y, next)
+      elif(!Map.member(ix, b) && (a == 1 || a == 2))
+        step2'(b, l, lmax, x + 1, y, next{[ix] = ()})
+      elif(Map.member(ix, b))
+        step2'(b, l, lmax, x + 1, y, next{[ix] = ()})
+      else
+        step2'(b, l, lmax, x + 1, y, next)
+
+  function adjacent2(b, l, x, y) =
+    let iff(l, x, y) = if(Map.member((l, x, y), b)) 1 else 0
+    let a = switch((x, y))
+              (0, 0) => iff(l - 1, 1, 2) + iff(l - 1, 2, 1)
+              (0, 4) => iff(l - 1, 1, 2) + iff(l - 1, 2, 3)
+              (4, 4) => iff(l - 1, 3, 2) + iff(l - 1, 2, 3)
+              (4, 0) => iff(l - 1, 3, 2) + iff(l - 1, 2, 1)
+              (0, _) => if(Map.member((l - 1, 1, 2), b)) 1 else 0
+              (4, _) => if(Map.member((l - 1, 3, 2), b)) 1 else 0
+              (_, 0) => if(Map.member((l - 1, 2, 1), b)) 1 else 0
+              (_, 4) => if(Map.member((l - 1, 2, 3), b)) 1 else 0
+              (2, 1) =>
+                let a = if(Map.member((l + 1, 0, 0), b)) 1 else 0
+                let a = if(Map.member((l + 1, 1, 0), b)) a + 1 else a
+                let a = if(Map.member((l + 1, 2, 0), b)) a + 1 else a
+                let a = if(Map.member((l + 1, 3, 0), b)) a + 1 else a
+                if(Map.member((l + 1, 4, 0), b)) a + 1 else a
+              (2, 3) =>
+                let a = if(Map.member((l + 1, 0, 4), b)) 1 else 0
+                let a = if(Map.member((l + 1, 1, 4), b)) a + 1 else a
+                let a = if(Map.member((l + 1, 2, 4), b)) a + 1 else a
+                let a = if(Map.member((l + 1, 3, 4), b)) a + 1 else a
+                if(Map.member((l + 1, 4, 4), b)) a + 1 else a
+              (1, 2) =>
+                let a = if(Map.member((l + 1, 0, 0), b)) 1 else 0
+                let a = if(Map.member((l + 1, 0, 1), b)) a + 1 else a
+                let a = if(Map.member((l + 1, 0, 2), b)) a + 1 else a
+                let a = if(Map.member((l + 1, 0, 3), b)) a + 1 else a
+                if(Map.member((l + 1, 0, 4), b)) a + 1 else a
+              (3, 2) =>
+                let a = if(Map.member((l + 1, 4, 0), b)) 1 else 0
+                let a = if(Map.member((l + 1, 4, 1), b)) a + 1 else a
+                let a = if(Map.member((l + 1, 4, 2), b)) a + 1 else a
+                let a = if(Map.member((l + 1, 4, 3), b)) a + 1 else a
+                if(Map.member((l + 1, 4, 4), b)) a + 1 else a
+              _ => 0
+    let a = if(Map.member((l, x - 1, y), b)) a + 1 else a
+    let a = if(Map.member((l, x + 1, y), b)) a + 1 else a
+    let a = if(Map.member((l, x, y - 1), b)) a + 1 else a
+    if(Map.member((l, x, y + 1), b)) a + 1 else a
+
+  function mk_board2(board : list(list(int))) =
+    let ss(d) = if(d == 0) [] else [d]
+    Map.from_list([((0, Pair.fst(xs), Pair.fst(ys)), ())
+                  | ys <- List.enumerate(board),
+                    xs <- List.enumerate(Pair.snd(ys)),
+                    s  <- ss(Pair.snd(xs)) ])
+
+  function board() =
+    [[1, 1, 0, 1, 0],
+     [0, 1, 0, 1, 1],
+     [0, 1, 0, 0, 0],
+     [1, 0, 0, 1, 0],
+     [0, 1, 1, 0, 0]]
+
+  function board1() =
+    [[0, 0, 0, 0, 1],
+     [1, 0, 0, 1, 0],
+     [1, 0, 0, 1, 1],
+     [0, 0, 1, 0, 0],
+     [1, 0, 0, 0, 0]]

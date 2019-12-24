@@ -548,6 +548,25 @@ idle. Keep track of NAT messages and halt once it cycles.
 11319
 ```
 
+### [Day 24](24/sol_24.aes)
+
+The [twenty-fourth problem](https://adventofcode.com/2019/day/24) was about a
+variant of game of life. I solved part 1 using Bit-arrays (`bits`) since we had
+to score the first repeated game board and that score was exactly the bit array
+:-) The twist for part 2 was to make the board infinitely recursive - though we
+only had to make 200 iterations so the size was manageable. Since it is
+Christmas I didn't have time to optimize it, one could limit the computation
+quite a bit rather easily. But it runs in about 5 minutes.
+
+```
+162> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/24/sol_24.aes", "solve_1", []).
+0 steps / 1600333 gas / 0 reductions / 241.96ms
+{bits,17321586}
+163> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/24/sol_24.aes", "solve_2", [200]).
+0 steps / 2572446815615 gas / 0 reductions / 273581.75ms
+1921
+```
+
 ## Running contracts
 
 For obvious reasons I don't want to run these contracts on-chain, and I don't
