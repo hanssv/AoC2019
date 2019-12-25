@@ -567,6 +567,57 @@ quite a bit rather easily. But it runs in about 5 minutes.
 1921
 ```
 
+### [Day 25](25/sol_25.aes)
+
+The [twenty-fifth problem](https://adventofcode.com/2019/day/25) was an
+`Intcode` text adventure! Since interaction is slow in a text adventure we keep
+the state in the contract and call it for each command. Today there was only a
+part one, and to keep the description reasonably short I've fused the commands
+necessary to complete the puzzle into just two command sequences. I also
+defined the `Cmd` help function in the Erlang shell.
+
+So, success! It could be done, and most days the extra challenge of doing it in
+Sophia wasn't too bad. Some days were challenging, but all of them got solved.
+In the meantime we collected lots of ideas for improvements of Sophia, some
+already implemented and not released and some more in the pipeline!
+
+```
+42> f(Cmd), Cmd = fun(C) -> S = aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/25/sol_25.aes", "run", [C], [no_store]), io:format("~s", [S]) end.                     #Fun<erl_eval.6.99386804>
+43> Cmd = fun(C) -> S = aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/25/sol_25.aes", "run", [C], [no_store]), io:format("~s", [S]) end.
+#Fun<erl_eval.6.99386804>
+44> aefa_sophia_test:run_file("/Users/hans/Personal/Repos/AoC2019/25/sol_25.aes", "init", [], [no_store]).                                                                           0 steps / 813523 gas / 0 reductions / 224.86ms
+{tuple,{}}
+45> Cmd("west\ntake hypercube\nwest\nwest\nnorth\ntake shell\nwest\n\nsouth\ntake festive hat\nnorth\neast\nsouth\neast\neast\neast\n").                                             0 steps / 949057396 gas / 0 reductions / 32923.85ms
+
+
+
+== Hull Breach ==
+You got in through a hole in the floor here. To keep your ship from also freezing, the hole has been sealed.
+
+...
+Command?
+ok
+46>  Cmd("east\nnorth\nwest\nnorth\nwest\nwest\ntake astronaut ice cream\nsouth\nsouth\n").
+0 steps / 241315500 gas / 0 reductions / 13948.85ms
+
+
+
+== Crew Quarters ==
+The beds are all too small for you.
+
+...
+== Pressure-Sensitive Floor ==
+Analyzing...
+
+Doors here lead:
+- north
+
+A loud, robotic voice says "Analysis complete! You may proceed." and you enter the cockpit.
+Santa notices your small droid, looks puzzled for a moment, realizes what has happened, and radios your ship directly.
+"Oh, hello! You should be able to get in by typing 33624080 on the keypad at the main airlock."
+ok
+```
+
 ## Running contracts
 
 For obvious reasons I don't want to run these contracts on-chain, and I don't
