@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "List.aes"
 include "Pair.aes"
 
@@ -19,12 +20,11 @@ contract Day6 =
     let orb_santa = orbits("SAN", orb_map)
     calc_distance(orb_you, orb_santa)
 
-  stateful function calc_omc(objs : list(string * string), om : map(string, string), sum : int) =
-    switch(objs)
-      [] => sum
-      (_, obj) :: objs =>
-        let s = calc_obj_orbits(obj, om)
-        calc_omc(objs, om, sum + s)
+  stateful function
+    calc_omc([], _, sum) = sum
+    calc_omc((_, obj) :: objs, om, sum : int) =
+      let s = calc_obj_orbits(obj, om)
+      calc_omc(objs, om, sum + s)
 
   stateful function calc_obj_orbits(obj : string, om : map(string, string)) =
     switch(Map.lookup(obj, state))
@@ -47,11 +47,9 @@ contract Day6 =
       None     => os
       Some(o') => orbits'(o', om, o' :: os)
 
-  function calc_distance(os1 : list(string), os2 : list(string)) =
-    switch((os1, os2))
-      (o1 :: os1', o2 :: os2') =>
-        if(o1 == o2) calc_distance(os1', os2')
-        else         List.length(os1) + List.length(os2)
+  function calc_distance(o1 :: os1' : list(string), o2 :: os2' : list(string)) =
+    if(o1 == o2) calc_distance(os1', os2')
+    else         List.length(os1') + List.length(os2') + 2
 
   entrypoint build_map(data : list(string * string)) =
     Map.from_list(List.map(Pair.swap, data))

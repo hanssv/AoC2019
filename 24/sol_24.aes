@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "List.aes"
 include "Pair.aes"
 contract Day24 =
@@ -12,9 +13,8 @@ contract Day24 =
   function mk_board(board : list(list(int))) =
     let ss(d) = if(d == 0) [] else [d]
     List.foldl(Bits.set, Bits.none,
-               [ Pair.fst(xs) + Pair.fst(ys) * 5 | ys <- List.enumerate(board),
-                                                   xs <- List.enumerate(Pair.snd(ys)),
-                                                   s  <- ss(Pair.snd(xs)) ])
+               [ x + y * 5 | (y, ys) <- List.enumerate(board),
+                             (x, 1) <- List.enumerate(ys) ])
 
   function solve(b, m : set(bits)) =
     if(Map.member(b, m)) b
@@ -47,9 +47,7 @@ contract Day24 =
 
   entrypoint solve_2(n) =
     let b = mk_board2(board())
-    // b
     Map.size(solve'(n, 0, b))
-    // adjacent2(b, -1, 3, 2)
 
   function solve'(n, l, b) =
     if(n == 0) b
@@ -118,10 +116,9 @@ contract Day24 =
 
   function mk_board2(board : list(list(int))) =
     let ss(d) = if(d == 0) [] else [d]
-    Map.from_list([((0, Pair.fst(xs), Pair.fst(ys)), ())
-                  | ys <- List.enumerate(board),
-                    xs <- List.enumerate(Pair.snd(ys)),
-                    s  <- ss(Pair.snd(xs)) ])
+    Map.from_list([((0, x, y), ())
+                  | (y, ys) <- List.enumerate(board),
+                    (x, 1) <- List.enumerate(ys)])
 
   function board() =
     [[1, 1, 0, 1, 0],

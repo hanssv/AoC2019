@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "List.aes"
 include "Pair.aes"
 include "/Users/hans/Personal/Repos/AoC2019/11/Intcode.aes"
@@ -53,12 +54,14 @@ contract Day11 =
 
   function output_grid(m : map(int * int, int)) =
     let cmp(a, b) = a =< b
-    let xs = List.sort(cmp, [Pair.fst(Pair.fst(p)) | p <- Map.to_list(m)])
-    let ys = List.sort(cmp, [Pair.snd(Pair.fst(p)) | p <- Map.to_list(m)])
-    switch((List.first(xs), List.last(xs), List.first(ys), List.last(ys)))
-      (Some(xmin), Some(xmax), Some(ymin), Some(ymax)) =>
-        let xs = List.from_to(xmin, xmax)
-        List.reverse(List.map((y) => output_line(xs, y, m), List.from_to(ymin, ymax)))
+    let xs = List.sort(cmp, [p | ((p, _), _) <- Map.to_list(m)])
+    let ys = List.sort(cmp, [p | ((_, p), _) <- Map.to_list(m)])
+    let Some(xmin) = List.first(xs)
+    let Some(xmax) = List.last(xs)
+    let Some(ymin) = List.first(ys)
+    let Some(ymax) = List.last(ys)
+    let xs = [xmin..xmax]
+    List.reverse(List.map((y) => output_line(xs, y, m), [ymin..ymax]))
 
   function output_line(xs, y, m) =
     let to_str(c) = if(c == 1) "#" else " "

@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 contract Day4 =
   entrypoint solve_1() =
     check_pwds(256310, 732736, check_pwd)
@@ -16,9 +17,9 @@ contract Day4 =
                      else           check_pwds'(x + 1, to, chk_fun, acc)
         (_, x1)   => check_pwds'(x1, to, chk_fun, acc)
 
-  entrypoint increasing(x, fac) =
-    if(fac == 1) (true, 0)
-    else
+  entrypoint
+    increasing(x, 1)   = (true, 0)
+    increasing(x, fac) =
       let fac' = fac / 10
       let d1 = (x / fac)  mod 10
       let d2 = (x / fac') mod 10

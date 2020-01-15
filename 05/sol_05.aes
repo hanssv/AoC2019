@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "List.aes"
 
 contract Day5 =
@@ -16,7 +17,6 @@ contract Day5 =
     let op = opcode mod 100
     let i0 = (opcode / 100)   mod 10
     let i1 = (opcode / 1000)  mod 10
-    // let i2 = (opcode / 10000) mod 10
     switch(op)
       99 => List.reverse(output)
       1  => // Add
@@ -65,10 +65,10 @@ contract Day5 =
   function setup_mem(is : list(int)) =
     setup_mem'(0, is, {})
 
-  function setup_mem'(ix : int, xs : list(int), m : map(int, int)) =
-    switch(xs)
-      (x :: xs) => setup_mem'(ix + 1, xs, m{[ix] = x})
-      []        => m
+  function
+    setup_mem' : (int, list(int), map(int, int)) => map(int, int)
+    setup_mem'(_, [], m) = m
+    setup_mem'(ix, x :: xs, m) = setup_mem'(ix + 1, xs, m{[ix] = x})
 
   function code() =
     [3, 225, 1, 225, 6, 6, 1100, 1, 238, 225, 104, 0, 1101, 90, 64, 225, 1101,

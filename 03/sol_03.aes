@@ -1,25 +1,22 @@
+@compiler >= 4.2.0
 include "List.aes"
 contract Day3 =
+  type set('a) = map('a, unit)
   datatype wire = R(int) | U(int) | L(int) | D(int)
 
   entrypoint solve_1() =
     solve_1'(input())
 
-  function solve_1'(ws : list(list(wire))) =
-    switch(ws)
-      [w1, w2] =>
-        let m  = populate(0, 0, w1, {})
-        let xs = cross_wire(0, 0, w2, m, [])
-        min(cmp, xs)
+  function solve_1'([w1, w2] : list(list(wire))) =
+    let m  = populate(0, 0, w1, {})
+    let x :: xs = cross_wire(0, 0, w2, m, [])
+    min(cmp, x, xs)
 
-  function cmp(p, q) =
-    switch((p, q))
-      ((x1, y1), (x2, y2)) =>
-        (abs(x1) + abs(y1)) =< (abs(x2) + abs(y2))
+  function cmp((x1, y1), (x2, y2)) = abs(x1) + abs(y1) =< abs(x2) + abs(y2)
 
-  function populate(x : int, y : int, ws : list(wire), m : map(int * int, unit)) =
+  function populate(x : int, y : int, ws : list(wire), m : set(int * int)) =
     switch(ws)
-      [] => m
+      []           => m
       (R(r) :: ws) => pop_h(1,  x, y, r, ws, m)
       (L(l) :: ws) => pop_h(-1, x, y, l, ws, m)
       (U(u) :: ws) => pop_v(1,  x, y, u, ws, m)
@@ -37,7 +34,7 @@ contract Day3 =
 
   function cross_wire(x, y, ws, m, acc) =
     switch(ws)
-      [] => acc
+      []           => acc
       (R(r) :: ws) => chk_h(1,  x, y, r, ws, m, acc)
       (L(l) :: ws) => chk_h(-1, x, y, l, ws, m, acc)
       (U(u) :: ws) => chk_v(1,  x, y, u, ws, m, acc)
@@ -45,31 +42,31 @@ contract Day3 =
 
   function chk_h(d, x, y, i, ws, m, acc) =
     let x' = x + d
-    if(i == 1) cross_wire(x', y, ws, m, acc)
-    else switch(Map.member((x', y), m))
-            false => chk_h(d, x', y, i - 1, ws, m, acc)
-            true  => chk_h(d, x', y, i - 1, ws, m, (x', y) :: acc)
+    if(i == 1)
+      cross_wire(x', y, ws, m, acc)
+    elif(Map.member((x', y), m))
+      chk_h(d, x', y, i - 1, ws, m, (x', y) :: acc)
+    else
+      chk_h(d, x', y, i - 1, ws, m, acc)
 
   function chk_v(d, x, y, i, ws, m, acc) =
     let y' = y + d
-    if(i == 1) cross_wire(x, y', ws, m, acc)
-    else switch(Map.member((x, y'), m))
-            false => chk_v(d, x, y', i - 1, ws, m, acc)
-            true  => chk_v(d, x, y', i - 1, ws, m, (x, y') :: acc)
+    if(i == 1)
+      cross_wire(x, y', ws, m, acc)
+    elif(Map.member((x, y'), m))
+      chk_v(d, x, y', i - 1, ws, m, (x, y') :: acc)
+    else
+      chk_v(d, x, y', i - 1, ws, m, acc)
 
   entrypoint solve_2() =
     solve_2'(input())
 
-  function solve_2'(ws : list(list(wire))) =
-    switch(ws)
-      [w1, w2] =>
-        let m  = populate'(1, 0, 0, w1, {})
-        let xs = cross_wire'(1, 0, 0, w2, m, [])
-        min(cmp', xs)
+  function solve_2'([w1, w2] : list(list(wire))) =
+    let m  = populate'(1, 0, 0, w1, {})
+    let x :: xs = cross_wire'(1, 0, 0, w2, m, [])
+    min(cmp', x, xs)
 
-  function cmp'(p, q) =
-    switch((p, q))
-      ((x, _), (y, _)) => x =< y
+  function cmp'((x, _), (y, _)) = x =< y
 
   function populate'(s : int, x : int, y : int, ws : list(wire), m : map(int * int, int)) =
     switch(ws)
@@ -79,17 +76,17 @@ contract Day3 =
       (U(u) :: ws) => pop_v'(s, 1,  x, y, u, ws, m)
       (D(d) :: ws) => pop_v'(s, -1, x, y, d, ws, m)
 
-  function pop_h'(s, d, x, y, i, ws, m) =
-    let x' = x + d
-    let s' = s + 1
-    if(i == 1) populate'(s', x', y, ws, m)
-    else pop_h'(s', d, x', y, i - 1, ws, m{[(x', y)] = s})
+  function
+    pop_h'(s, d, x, y, 1, ws, m) = populate'(s + 1, x + d, y, ws, m)
+    pop_h'(s, d, x, y, i, ws, m) =
+      let x' = x + d
+      pop_h'(s + 1, d, x', y, i - 1, ws, m{[(x', y)] = s})
 
-  function pop_v'(s, d, x, y, i, ws, m) =
-    let y' = y + d
-    let s' = s + 1
-    if(i == 1) populate'(s', x, y', ws, m)
-    else pop_v'(s', d, x, y', i - 1, ws, m{[(x, y')] = s})
+  function
+    pop_v'(s, d, x, y, 1, ws, m) = populate'(s + 1, x, y + d, ws, m)
+    pop_v'(s, d, x, y, i, ws, m) =
+      let y' = y + d
+      pop_v'(s + 1, d, x, y', i - 1, ws, m{[(x, y')] = s})
 
   function cross_wire'(s, x, y, ws, m, acc) =
     switch(ws)
@@ -99,35 +96,31 @@ contract Day3 =
       (U(u) :: ws) => chk_v'(s, 1,  x, y, u, ws, m, acc)
       (D(d) :: ws) => chk_v'(s, -1, x, y, d, ws, m, acc)
 
-  function chk_h'(s, d, x, y, i, ws, m, acc) =
-    let x' = x + d
-    let s' = s + 1
-    if(i == 1) cross_wire'(s', x', y, ws, m, acc)
-    else switch(Map.lookup((x', y), m))
-            None     => chk_h'(s', d, x', y, i - 1, ws, m, acc)
-            Some(s1) => chk_h'(s', d, x', y, i - 1, ws, m, (s1 + s, (x', y)) :: acc)
+  function
+    chk_h'(s, d, x, y, 1, ws, m, acc) = cross_wire'(s + 1, x + d, y, ws, m, acc)
+    chk_h'(s, d, x, y, i, ws, m, acc) =
+      let x' = x + d
+      switch(Map.lookup((x', y), m))
+        None     => chk_h'(s + 1, d, x', y, i - 1, ws, m, acc)
+        Some(s1) => chk_h'(s + 1, d, x', y, i - 1, ws, m, (s1 + s, (x', y)) :: acc)
 
-  function chk_v'(s, d, x, y, i, ws, m, acc) =
-    let y' = y + d
-    let s' = s + 1
-    if(i == 1) cross_wire'(s', x, y', ws, m, acc)
-    else switch(Map.lookup((x, y'), m))
-            None     => chk_v'(s', d, x, y', i - 1, ws, m, acc)
-            Some(s1) => chk_v'(s', d, x, y', i - 1, ws, m, (s1 + s, (x, y')) :: acc)
+  function
+    chk_v'(s, d, x, y, 1, ws, m, acc) = cross_wire'(s + 1, x, y + d, ws, m, acc)
+    chk_v'(s, d, x, y, i, ws, m, acc) =
+      let y' = y + d
+      switch(Map.lookup((x, y'), m))
+        None     => chk_v'(s + 1, d, x, y', i - 1, ws, m, acc)
+        Some(s1) => chk_v'(s + 1, d, x, y', i - 1, ws, m, (s1 + s, (x, y')) :: acc)
 
   function abs(x) =
     if(x < 0) -x
     else       x
 
-  function min(cmp : ('a, 'a) => bool, xs : list('a)) =
-    switch(xs)
-      x :: xs => min'(cmp, x, xs)
-
-  function min'(cmp, x, xs) =
-    switch(xs)
-      [] => x
-      x' :: xs => if(cmp(x, x')) min'(cmp, x, xs)
-                  else           min'(cmp, x', xs)
+  function
+    min(_, x, []) = x
+    min(cmp, x, x' :: xs) =
+      if(cmp(x, x')) min(cmp, x, xs)
+      else           min(cmp, x', xs)
 
 //   function test0() =
 //     [[R(8), U(5), L(5), D(3)],

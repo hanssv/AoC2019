@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "/Users/hans/Personal/Repos/AoC2019/11/Intcode.aes"
 contract Day19 =
   stateful entrypoint solve_1() =
@@ -19,7 +20,7 @@ contract Day19 =
       let n = if(in_beam(x, y, p)) n + 1 else n
       calc_pts'(x + 1, y, max, p, n)
 
-  function trace_beam(x : int, y : int, p : Incode.process, s : int) =
+  function trace_beam(x : int, y : int, p : Intcode.process, s : int) =
     switch(in_beam(x, y, p))
       true =>
         let s' = s - 1
@@ -29,7 +30,7 @@ contract Day19 =
       false =>
         trace_beam(x + 1, y, p, s)
 
-  function in_beam(x : int, y : int, p : Incode.process) =
+  function in_beam(x : int, y : int, p : Intcode.process) =
     let p' = Intcode.run_proc_step(p{ input = [x, y] })
     [1] == p'.output
 

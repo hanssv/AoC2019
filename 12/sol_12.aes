@@ -1,7 +1,9 @@
+@compiler >= 4.2.0
 include "List.aes"
 contract Day12 =
-  record vec  = {x : int, y : int, z : int}
-  record moon = {pos : vec, vel : vec}
+  record vec    = {x : int, y : int, z : int}
+  record planet = { x : int, v : int }
+  record system = { p1 : planet, p2 : planet, p3 : planet, p4 : planet }
 
   entrypoint solve_2() =
     let data = input()
@@ -11,17 +13,12 @@ contract Day12 =
     let a   = (p_x * p_y) / gcd(p_x, p_y)
     (a * p_z) / gcd(a, p_z)
 
-  record planet = { x : int, v : int }
-  record system = { p1 : planet, p2 : planet, p3 : planet, p4 : planet }
-
-  entrypoint periodicity(xs) =
-    switch(xs)
-      [x1, x2, x3, x4] =>
-        let s = {p1 = {x = x1, v = 0},
-                 p2 = {x = x2, v = 0},
-                 p3 = {x = x3, v = 0},
-                 p4 = {x = x4, v = 0}}
-        pdc_p(0, s, {})
+  entrypoint periodicity([x1, x2, x3, x4]) =
+    let s = {p1 = {x = x1, v = 0},
+             p2 = {x = x2, v = 0},
+             p3 = {x = x3, v = 0},
+             p4 = {x = x4, v = 0}}
+    pdc_p(0, s, {})
 
   function pdc_p(step, s, m) =
     if(Map.member(s, m)) step
@@ -45,45 +42,40 @@ contract Day12 =
     let v = p.v + delta(x1) + delta(x2) + delta(x3)
     {x = p.x + v, v = v}
 
-  function gcd(a : int, b : int) =
-    switch(b)
-      0 => a
-      _ => gcd(b, a mod b)
+  function
+    gcd : (int, int) => int
+    gcd(a, 0) = a
+    gcd(a, b) = gcd(b, a mod b)
+
+  type moon = vec * vec
 
   entrypoint solve_1() =
-    let mk_m(p) = { pos = p, vel = {x = 0, y = 0, z = 0} }
-    let ms' = steps(1000, [ mk_m(p) | p <- input() ])
-    (energy(ms'), ms')
+    let v0 = {x = 0, y = 0, z = 0}
+    let ms = steps(1000, [ (p, v0) | p <- input() ])
+    (energy(ms), ms)
 
   function steps(n, ms) =
     if(n == 0) ms
-    else       steps(n - 1, step(ms))
+    else       steps(n - 1, [step(m, ms) | m <- ms])
 
-  function step(ms : list(moon)) =
-    [ step'(m, ms) | m <- ms ]
+  function
+    step : (moon, list(moon)) => moon
+    step((p, v), [])  = ({x = p.x + v.x, y = p.y + v.y, z = p.z + v.z }, v)
+    step(m, m' :: ms) = step(update_vel(m, m'), ms)
 
-  function step'(m : moon, ms : list(moon)) =
-    switch(ms)
-      [] => m{ pos = { x = m.pos.x + m.vel.x,
-                       y = m.pos.y + m.vel.y,
-                       z = m.pos.z + m.vel.z } }
-      m2 :: ms => step'(update_vel(m, m2), ms)
-
-  function update_vel(m, m2) =
+  function update_vel((p, v), (p2, _)) =
     let upd(a, b, c) =
       if(a > b) c - 1
       elif(a < b) c + 1
       else c
-    m{ vel = { x = upd(m.pos.x, m2.pos.x, m.vel.x),
-               y = upd(m.pos.y, m2.pos.y, m.vel.y),
-               z = upd(m.pos.z, m2.pos.z, m.vel.z) } }
+    (p, { x = upd(p.x, p2.x, v.x),
+          y = upd(p.y, p2.y, v.y),
+          z = upd(p.z, p2.z, v.z) })
 
   function energy(ms : list(moon)) =
-    let es = [vec_energy(m.pos) * vec_energy(m.vel) | m <- ms ]
+    let v_en(v) = abs(v.x) + abs(v.y) + abs(v.z)
+    let es = [v_en(p) * v_en(v) | (p, v) <- ms ]
     List.foldl((a, b) => a + b, 0, es)
-
-  function vec_energy(v) =
-    abs(v.x) + abs(v.y) + abs(v.z)
 
   function abs(x) =
     if(x < 0) -x else x

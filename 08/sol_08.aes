@@ -1,37 +1,34 @@
+@compiler >= 4.2.0
 include "List.aes"
 contract Day8 =
 
   entrypoint solve_1() =
-    let layers = split_layers(input(), 25, 6)
-    let csums  = List.sort(cmp_csum, List.map(csum_layer, layers))
-    switch(csums)
-      cs :: _ => cs
+    let layers  = split_layers(input(), 25, 6)
+    let cs :: _ = List.sort(cmp_csum, List.map(csum_layer, layers))
+    cs
 
   entrypoint solve_2() =
     let layers = split_layers(input(), 25, 6)
     let img = flatten_layers(layers)
     fix_image(img, 25)
 
-  function fix_image(pixels : list(int), w : int) =
-    switch(pixels)
-      [] => []
-      ps => List.take(w, ps) :: fix_image(List.drop(w, ps), w)
+  function
+    fix_image : (list(int), int) => list(list(int))
+    fix_image([], _) = []
+    fix_image(ps, w) = List.take(w, ps) :: fix_image(List.drop(w, ps), w)
 
-  function flatten_layers(layers : list(list(int))) =
-    switch(layers)
-      layer :: layers => List.foldl(flatten_layer, layer, layers)
+  function flatten_layers(layer :: layers : list(list(int))) =
+    List.foldl(flatten_layer, layer, layers)
 
   function flatten_layer(img : list(int), layer : list(int)) =
     List.map(flatten_pixel, List.zip(img, layer))
 
-  function flatten_pixel(p : int * int) =
-    switch(p)
-      (2, x) => x
-      (x, _) => x
+  function
+    flatten_pixel: (int * int) => int
+    flatten_pixel((2, x)) = x
+    flatten_pixel((x, _)) = x
 
-  function cmp_csum(cs1 : int * int, cs2 : int * int) =
-    switch((cs1, cs2))
-      ((zs1, _), (zs2, _)) => zs1 =< zs2
+  function cmp_csum((zs1, _), (zs2, _)) = zs1 =< zs2
 
   function csum_layer(pixels : list(int)) = csum_layer'(pixels, 0, 0, 0)
 
@@ -46,17 +43,16 @@ contract Day8 =
     let divider = 10 ^ (w * h)
     split_layers'(data, divider, [])
 
-  function split_layers'(data : int, divider : int, layers : list(list(int))) =
-    switch(data)
-      0 => layers
-      _ =>
-        let layer = data mod divider
-        split_layers'(data / divider, divider, split_layer(layer, divider, []) :: layers)
+  function
+    split_layers' : (int, int, list(list(int))) => list(list(int))
+    split_layers'(0, _, layers) = layers
+    split_layers'(data, divider, layers) =
+      let layer = data mod divider
+      split_layers'(data / divider, divider, split_layer(layer, divider, []) :: layers)
 
-  function split_layer(x, d, acc) =
-    switch(d)
-      1 => acc
-      _ => split_layer(x / 10, d / 10, x mod 10 :: acc)
+  function
+    split_layer(_, 1, acc) = acc
+    split_layer(x, d, acc) = split_layer(x / 10, d / 10, x mod 10 :: acc)
 
 
   function input() =

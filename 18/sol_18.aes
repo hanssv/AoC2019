@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "List.aes"
 include "Pair.aes"
 
@@ -33,8 +34,7 @@ contract Day18 =
   function holes_(acc, xs) =
     switch(xs)
       []      => []
-      x :: xs =>
-        { pre = List.reverse(acc), elem = x, suf = xs } :: holes_(x :: acc, xs)
+      x :: xs => { pre = List.reverse(acc), elem = x, suf = xs } :: holes_(x :: acc, xs)
 
   record heap_entry = { here : list(node), dist : int, path : list(int), todo : bits }
 
@@ -56,49 +56,44 @@ contract Day18 =
         Some(e :: es) => Some((e, h{ entries[c] = es }))
 
   function shortest_path(seen : set(list(node) * bits), heap : heap) =
-    switch (heap_next(heap))
-      Some((e, heap)) =>
-        let here = e.here
-        let hash = (e.here, e.todo)
-        if (Map.member(hash, seen))
-          shortest_path(seen, heap)
-        elif (e.todo == Bits.none)
-          (List.reverse(e.path), e.dist)
-        else
-          let seen' = seen{ [hash] = () }
-          let mk_h_entry(h, d, p, t) = {here = h, dist = d, path = p, todo = t}
-          let next  = [ mk_h_entry(hole.pre ++ [edge.to] ++ hole.suf,
-                                   e.dist + edge.dist, edge.to :: e.path,
-                                   Bits.clear(e.todo, edge.to))
-                      | hole <- holes(here),
-                        edge <- state[hole.elem],
-                        if (Bits.test(e.todo, edge.to)),                        // We still need this key
-                        if (Bits.none == Bits.intersection(edge.keys, e.todo)), // Don't go through keys we still need
-                        if (Bits.none == Bits.intersection(edge.doors, e.todo)) // Can't go through doors we haven't unlocked
-                      ]
-          shortest_path(seen', List.foldr(heap_insert, heap, next))
+    let Some((e, heap)) = heap_next(heap)
+    let here = e.here
+    let hash = (e.here, e.todo)
+    if (Map.member(hash, seen))
+      shortest_path(seen, heap)
+    elif (e.todo == Bits.none)
+      (List.reverse(e.path), e.dist)
+    else
+      let seen' = seen{ [hash] = () }
+      let next  = [ {here = hole.pre ++ [edge.to] ++ hole.suf,
+                     dist = e.dist + edge.dist, path = edge.to :: e.path,
+                     todo = Bits.clear(e.todo, edge.to) }
+                  | hole <- holes(here),
+                    edge <- state[hole.elem],
+                    if (Bits.test(e.todo, edge.to)),                        // We still need this key
+                    if (Bits.none == Bits.intersection(edge.keys, e.todo)), // Don't go through keys we still need
+                    if (Bits.none == Bits.intersection(edge.doors, e.todo)) // Can't go through doors we haven't unlocked
+                  ]
+      shortest_path(seen', List.foldr(heap_insert, heap, next))
 
   datatype block = Start | Path | Key(int) | Door(int)
   type pos = int * int
   type maze = map(pos, block)
 
   function build_graph(maze : maze) : graph =
-    let starts = [ Pair.fst(pb) | pb <- Map.to_list(maze), if(Pair.snd(pb) == Start) ]
+    let starts = [ p | (p, s) <- Map.to_list(maze), if(s == Start) ]
     let starts = Map.from_list(List.map(Pair.swap, List.enumerate(starts)))
-    let mk_node(pb) =
-          switch(pb)
-            (pos, block) =>
-              switch(Map.lookup(pos, starts))
-                Some(n) => [-n]
-                None    => block_to_node(block)
+    let mk_node((pos, block)) =
+          switch(Map.lookup(pos, starts))
+            Some(n) => [-n]
+            None    => block_to_node(block)
     Map.from_list(
       [ (node, all_paths(maze, Pair.fst(pb)))
       | pb <- Map.to_list(maze),
         node <- mk_node(pb) ])
 
-  function neighbours(p : pos) : list(pos) =
-    switch(p)
-      (x, y) => [(x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y)]
+  function neighbours((x, y) : pos) : list(pos) =
+    [(x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y)]
 
   function all_paths(maze : maze, p : pos) : list(edge) =
     all_paths_(maze, [{pos = p, dist = 0, keys = Bits.none, doors = Bits.none}], {}, {})
@@ -112,13 +107,12 @@ contract Day18 =
       _      => []
 
   function ann_p_to_edge(maze, ap) =
-    let mk_edge(t, d, ks, ds) = {to = t, dist = d, keys = ks, doors = ds}
-    [ mk_edge(i, ap.dist, Bits.clear(ap.keys, i), ap.doors)
+    [ {to = i, dist = ap.dist, keys = Bits.clear(ap.keys, i), doors = ap.doors}
       | i <- block_to_node(maze[ap.pos]), if(ap.dist > 0)]
 
   function all_paths_(maze, q : list(ann_p), acc : map(pos, edge), seen : set(pos)) : list(edge) =
     switch (q)
-      [] => [ Pair.snd(kv) | kv <- Map.to_list(acc) ]
+      [] => [ e | (_, e) <- Map.to_list(acc) ]
       _  =>
         let acc'  = List.foldr((pe, acc) => acc{[Pair.fst(pe)] = Pair.snd(pe)},
                                acc, [ (ap.pos, e) | ap <- q, e <- ann_p_to_edge(maze, ap), if(e.to != 0) ])
@@ -131,8 +125,8 @@ contract Day18 =
               switch(x)
                 Key(i) => Bits.set(b, i)
                 _      => b
-        let mk_ann_p(p, d, ks, ds) = {pos = p, dist = d, keys = ks, doors = ds}
-        let q'    = [ mk_ann_p(p', ap.dist + 1, set_key(item, ap.keys), set_door(item, ap.doors))
+        let q'    = [ {pos = p', dist = ap.dist + 1, keys = set_key(item, ap.keys),
+                       doors = set_door(item, ap.doors)}
                       | ap <- q,
                         p' <- neighbours(ap.pos),
                         if (!Map.member(p', seen')),

@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "List.aes"
 contract Day2 =
 
@@ -6,16 +7,16 @@ contract Day2 =
 
   entrypoint solve_2() =
     let mem   = setup_mem(0, input(), {})
-    let range = List.from_to(0, 99)
+    let range = [0..99]
     let vals  = [ (x, y) | x <- range, y <- range ]
     solve_2'(mem, vals)
 
-  function solve_2'(mem : map(int, int), vals : list(int * int)) =
-    switch(vals)
-      (n, v) :: vals =>
-        let res = run(0, init_mem(n, v, mem))
-        if(res == 19690720) 100 * n + v
-        else                solve_2'(mem, vals)
+  function
+    solve_2' : (map(int, int), list(int * int)) => int
+    solve_2'(mem, (n, v) :: vals) =
+      let res = run(0, init_mem(n, v, mem))
+      if(res == 19690720) 100 * n + v
+      else                solve_2'(mem, vals)
 
   entrypoint run(pc : int, m : map(int, int)) =
     switch(m[pc])
@@ -31,14 +32,14 @@ contract Day2 =
         let z = m[pc + 3]
         run(pc + 4, m{[z] = m[x] * m[y]})
 
-  entrypoint setup_and_init_mem(noun : int, verb : int) =
+  function setup_and_init_mem(noun : int, verb : int) =
     let mem = setup_mem(0, input(), {})
     init_mem(noun, verb, mem)
 
-  function setup_mem(ix : int, xs : list(int), m : map(int, int)) =
-    switch(xs)
-      (x :: xs) => setup_mem(ix + 1, xs, m{[ix] = x})
-      []        => m
+  function
+    setup_mem : (int, list(int), map(int, int)) => map(int, int)
+    setup_mem(_, [], m) = m
+    setup_mem(ix, x :: xs, m) = setup_mem(ix + 1, xs, m{[ix] = x})
 
   function init_mem(noun : int, verb : int, mem : map(int, int)) =
     mem{ [1] = noun, [2] = verb }

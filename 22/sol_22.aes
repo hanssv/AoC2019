@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "List.aes"
 contract Day22 =
   datatype technique = DealNew | Cut(int) | Deal(int)

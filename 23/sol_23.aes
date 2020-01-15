@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "/Users/hans/Personal/Repos/AoC2019/11/Intcode.aes"
 contract Day23 =
 
@@ -9,10 +10,9 @@ contract Day23 =
     run(ps, [])
 
   function run(ps, pts) =
-    switch(route_packets(ps, pts, []))
-      (ps, ixs) =>
-        switch(run_ixs(ixs, ps))
-          (ps, pts) => run(ps, pts)
+    let (ps, ixs) = route_packets(ps, pts, [])
+    let (ps, pts) = run_ixs(ixs, ps)
+    run(ps, pts)
 
   function route_packets(ps, pts, ixs) =
     switch(pts)
@@ -34,13 +34,12 @@ contract Day23 =
         if(Map.member(y, nm)) y
         else run2(ps, [(0, x, y)], nat, 0, nm{[y] = ()})
       (n, [], _) =>
-        switch(run_ixs([], ps))
-          (ps, pts) => run2(ps, pts, nat, n + 1, nm)
+        let(ps, pts) = run_ixs([], ps)
+        run2(ps, pts, nat, n + 1, nm)
       (_, pts, _) =>
-        switch(route_packets2(ps, pts, nat, []))
-          (ps, ixs, nat) =>
-            switch(run_ixs(ixs, ps))
-              (ps, pts) => run2(ps, pts, nat, 0, nm)
+        let (ps, ixs, nat) = route_packets2(ps, pts, nat, [])
+        let (ps, pts)      = run_ixs(ixs, ps)
+        run2(ps, pts, nat, 0, nm)
 
   function route_packets2(ps, pts, nat, ixs) =
     switch(pts)
@@ -69,9 +68,8 @@ contract Day23 =
       [] => []
       y :: x :: a :: data => (a, x, y) :: mk_packets(data)
 
-  function cc(ss : list(string)) =
-    switch(ss)
-      s :: ss => List.foldl(String.concat, s, ss)
+  function cc(s :: ss : list(string)) =
+    List.foldl(String.concat, s, ss)
 
   function code() =
     [3, 62, 1001, 62, 11, 10, 109, 2259, 105, 1, 0, 2187, 1043, 604, 1333,

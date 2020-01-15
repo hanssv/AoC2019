@@ -1,19 +1,24 @@
+@compiler >= 4.2.0
 include "/Users/hans/Personal/Repos/AoC2019/11/Intcode.aes"
 contract Day15 =
-  type state = int * int
-  entrypoint init() = (0, 0)
+  type pos = int * int
+  record state = { maze : map(pos, int), oxygen : pos }
+  entrypoint init() =
+    let p0 = Intcode.init_proc(input(), [])
+    let maze = mk_map(0, 0, p0, {[(0,0)] = 1}, [])
+    { maze = maze, oxygen = find_oxygen(maze) }
 
   stateful entrypoint solve_1() =
-    let p0 = Intcode.init_proc(input(), [])
-    let maze = mk_map(0, 0, p0, {[(0,0)] = 1}, [])
-    let visit = bfs((0, 0), maze)
-    visit[state]
+    let visit = bfs((0, 0), state.maze)
+    visit[state.oxygen]
 
   stateful entrypoint solve_2() =
-    let p0 = Intcode.init_proc(input(), [])
-    let maze = mk_map(0, 0, p0, {[(0,0)] = 1}, [])
-    let visit = bfs(state, maze)
+    let visit = bfs(state.oxygen, state.maze)
     List.get(0, List.sort(cmp, Map.to_list(visit)))
+
+  function find_oxygen(maze) =
+    let [x] = [ x | (x, 2) <- Map.to_list(maze) ]
+    x
 
   function cmp(a, b) =
     switch((a, b))
@@ -36,7 +41,7 @@ contract Day15 =
         let q1 = if(maze[(x - 1, y)] > 0 && !Map.member((x - 1, y), visited)) ((x - 1, y), d + 1) :: q1 else q1
         bfs2(q0, q1, maze, visited)
 
-  stateful function mk_map(x, y, p, m, bt) =
+  function mk_map(x, y, p, m, bt) =
     switch(select_dir(x, y, m))
       (false, _) =>
         switch(bt)

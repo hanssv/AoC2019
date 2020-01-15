@@ -11,13 +11,13 @@ namespace Intcode =
       (Done, prog) => prog
       (Run,  prog) => run_prog(pids, prog)
 
-  function route_data(pids : list(pid), prog : program) =
-    switch(pids)
-      [] => (Run, prog)
-      pid :: pids =>
-        switch(route_data'(pid, prog))
-          (true, prog') => route_data(pids, prog')
-          (false, prog) => (Done, prog)
+  function
+    route_data : (list(pid), program) => (status * program)
+    route_data([], prog) = (Run, prog)
+    route_data(pid :: pids, prog) =
+      switch(route_data'(pid, prog))
+        (true, prog') => route_data(pids, prog')
+        (false, prog) => (Done, prog)
 
   function route_data'(pid : pid, prog : program) =
     let p = prog[pid]
@@ -91,7 +91,7 @@ namespace Intcode =
   function setup_mem(is : list(int)) =
     setup_mem'(0, is, {})
 
-  function setup_mem'(ix : int, xs : list(int), m : map(int, int)) =
-    switch(xs)
-      (x :: xs) => setup_mem'(ix + 1, xs, m{[ix] = x})
-      []        => m
+  function
+    setup_mem' : (int, list(int), map(int, int)) => map(int, int)
+    setup_mem'(_, [], m) = m
+    setup_mem'(ix, x :: xs, m) = setup_mem'(ix + 1, xs, m{[ix] = x})

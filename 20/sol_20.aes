@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "List.aes"
 contract Day20 =
   datatype tile = Path | Inner(int, int) | Outer(int, int)
@@ -7,24 +8,22 @@ contract Day20 =
     let prob = prob()
     bfs([(prob.start, 0)], prob.end, prob.maze, {})
 
-  function bfs(xs, target, maze, visited) =
-    switch(xs)
-      ((x, y), d) :: xs =>
-        if(target == (x, y)) d
-        else
-          let visited = visited{ [(x, y)] = () }
-          switch(maze[(x, y)])
-            Path => bfs'(x, y, d, xs, target, maze, visited)
-            Inner(x1, y1) =>
-              if(Map.member((x1, y1), visited))
-                bfs'(x, y, d, xs, target, maze, visited)
-              else
-                bfs(xs ++ [((x1, y1), d + 1)], target, maze, visited)
-            Outer(x1, y1) =>
-              if(Map.member((x1, y1), visited))
-                bfs'(x, y, d, xs, target, maze, visited)
-              else
-                bfs(xs ++ [((x1, y1), d + 1)], target, maze, visited)
+  function bfs(((x, y), d) :: xs, target, maze, visited) =
+    if(target == (x, y)) d
+    else
+      let visited = visited{ [(x, y)] = () }
+      switch(maze[(x, y)])
+        Path => bfs'(x, y, d, xs, target, maze, visited)
+        Inner(x1, y1) =>
+          if(Map.member((x1, y1), visited))
+            bfs'(x, y, d, xs, target, maze, visited)
+          else
+            bfs(xs ++ [((x1, y1), d + 1)], target, maze, visited)
+        Outer(x1, y1) =>
+          if(Map.member((x1, y1), visited))
+            bfs'(x, y, d, xs, target, maze, visited)
+          else
+            bfs(xs ++ [((x1, y1), d + 1)], target, maze, visited)
 
   function bfs'(x, y, d, xs, target, maze, visited) =
     let qs = if(!Map.member((x + 1, y), visited) &&
@@ -41,25 +40,23 @@ contract Day20 =
     let prob = prob()
     bfs2([((0, prob.start), 0)], (0, prob.end), prob.maze, {})
 
-  function bfs2(xs : list((int * (int * int)) * int), target, maze, visited) =
-    switch(xs)
-      ((l, (x, y)), d) :: xs =>
-        let p = (l, (x, y))
-        if(target == p) d
-        else
-          let visited = visited{ [p] = () }
-          switch(maze[(x, y)])
-            Path => bfs2'(l, x, y, d, xs, target, maze, visited)
-            Inner(x1, y1) =>
-              if(l > 24 || Map.member((l + 1, (x1, y1)), visited))
-                bfs2'(l, x, y, d, xs, target, maze, visited)
-              else
-                bfs2(xs ++ [((l + 1, (x1, y1)), d + 1)], target, maze, visited)
-            Outer(x1, y1) =>
-              if(l == 0 || Map.member((l - 1, (x1, y1)), visited))
-                bfs2'(l, x, y, d, xs, target, maze, visited)
-              else
-                bfs2(xs ++ [((l - 1, (x1, y1)), d + 1)], target, maze, visited)
+  function bfs2(((l, (x, y)), d) :: xs, target, maze, visited) =
+    let p = (l, (x, y))
+    if(target == p) d
+    else
+      let visited = visited{ [p] = () }
+      switch(maze[(x, y)])
+        Path => bfs2'(l, x, y, d, xs, target, maze, visited)
+        Inner(x1, y1) =>
+          if(l > 24 || Map.member((l + 1, (x1, y1)), visited))
+            bfs2'(l, x, y, d, xs, target, maze, visited)
+          else
+            bfs2(xs ++ [((l + 1, (x1, y1)), d + 1)], target, maze, visited)
+        Outer(x1, y1) =>
+          if(l == 0 || Map.member((l - 1, (x1, y1)), visited))
+            bfs2'(l, x, y, d, xs, target, maze, visited)
+          else
+            bfs2(xs ++ [((l - 1, (x1, y1)), d + 1)], target, maze, visited)
 
   function bfs2'(l, x, y, d, xs, target, maze, visited) =
     let qs = if(!Map.member((l, (x + 1, y)), visited) &&

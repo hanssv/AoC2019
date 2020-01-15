@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "List.aes"
 contract Day14 =
 
@@ -18,27 +19,23 @@ contract Day14 =
       if(y > lim) bsearch(rm, lim, x0, x)
       else        bsearch(rm, lim, x,  x1)
 
-  function solve(need, have, rm) =
-    switch(need)
-      [] => have["ORE"]
-      (k, "ORE") :: need =>
-        solve(need, have{["ORE" = 0] @ o = k + o}, rm)
-      (k, i) :: need =>
-        switch(in_store(k, i, have))
-          (k, have) =>
-            if(k == 0) solve(need, have, rm)
-            else
-              switch(rm[i])
-                (n, need') =>
-                  let fac  = (k + n - 1) / n
-                  let rest = fac * n - k
-                  let have = if(rest > 0) have{[i = 0] @ x = x + rest } else have
-                  solve(add_need(fac, need', need), have, rm)
+  function
+    solve([], have, _) = have["ORE"]
+    solve((k, "ORE") :: need, have, rm) =
+      solve(need, have{["ORE" = 0] @ o = k + o}, rm)
+    solve((k, i) :: need, have, rm) =
+      let (k, have) = in_store(k, i, have)
+      if(k == 0) solve(need, have, rm)
+      else
+        let (n, need') = rm[i]
+        let fac  = (k + n - 1) / n
+        let rest = fac * n - k
+        let have = if(rest > 0) have{[i = 0] @ x = x + rest } else have
+        solve(add_need(fac, need', need), have, rm)
 
-  function add_need(k, need1, need0) =
-    switch(need1)
-      [] => need0
-      (n, x) :: need1 => (n * k, x) :: add_need(k, need1, need0)
+  function
+    add_need(_, [], need0)              = need0
+    add_need(k, (n, x) :: need1, need0) = (n * k, x) :: add_need(k, need1, need0)
 
   function in_store(k, i, have) =
     let l = have[i = 0]
@@ -46,8 +43,7 @@ contract Day14 =
     else      (k - l, Map.delete(i, have))
 
   function react_map(rs : list(list(int * string) * (int * string))) =
-    let flip(r) = switch(r)
-                    (rs, (n, m)) => (m, (n, rs))
+    let flip((rs, (n, m))) = (m, (n, rs))
     Map.from_list(List.map(flip, rs))
 
   function input0() =

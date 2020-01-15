@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "List.aes"
 contract Day16 =
 
@@ -28,26 +29,24 @@ contract Day16 =
       [] => acc
       x :: xs => mk_num(acc * 10 + x, xs)
 
-  function foo(k, d0s) =
-    switch(d0s)
-      d0 :: d0s =>
-        let ds = [ d0 | _ <- [1..k] ]
-        bar(d0s, ds, [d0])
+  function foo(k, d0 :: d0s) =
+    let ds = [ d0 | _ <- [1..k] ]
+    bar(d0s, ds, [d0])
 
   function bar(d0s, ds, res) =
     switch(d0s)
       [] => res
       d0 :: d0s =>
-        switch(dstep(d0, ds))
-          (d, ds') => bar(d0s, ds', d :: res)
+        let (d, ds') = dstep(d0, ds)
+        bar(d0s, ds', d :: res)
 
   function dstep(d0, ds) =
     switch(ds)
       [] => (d0, [])
       d :: ds =>
         let d' = (d0 + d) mod 10
-        switch(dstep(d', ds))
-          (dx, ds) => (dx, d' :: ds)
+        let (dx, ds) = dstep(d', ds)
+        (dx, d' :: ds)
 
   function fft(n, data, ps) =
     if(n == 0) data

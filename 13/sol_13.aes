@@ -1,7 +1,6 @@
+@compiler >= 4.2.0
 include "/Users/hans/Personal/Repos/AoC2019/11/Intcode.aes"
 contract Day13 =
-  record state = { p : Intcode.process, b : map(int * int, int) }
-
   record game = { b0 : int, b1 : int, p : int, s : int }
 
   entrypoint solve_1() =
@@ -14,8 +13,8 @@ contract Day13 =
     let p0 = Intcode.init_proc(input(), [0])
     let p1 = Intcode.run_proc_step(p0{ mem = p0.mem{[0] = 2} })
     let g  = get_game_state(p1.output, {b0 = -1, b1 = -1, p = -1, s = -1})
-    switch(step'(0, p1, g))
-      (p2, g2) => play(p2, g2)
+    let (p2, g2) = step'(0, p1, g)
+    play(p2, g2)
 
   function play(p, g) =
     if(g.b0 == g.b1) g
@@ -25,8 +24,8 @@ contract Day13 =
           if(g.p < g.b1) 1 else 0
         else
           if(g.p > g.b1) -1 else 0
-      switch(step'(move, p, g))
-        (p2, g2) => play(p2, g2)
+      let (p2, g2) = step'(move, p, g)
+      play(p2, g2)
 
   function step'(move, p, g) =
     let p' = Intcode.run_proc_step(p{ input = [move], output = [] })

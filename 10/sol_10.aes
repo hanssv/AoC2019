@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "List.aes"
 include "Pair.aes"
 contract Day10 =
@@ -10,12 +11,12 @@ contract Day10 =
     let cmp(a, b) = a >= b
     List.get(0, List.sort(cmp, [(Map.size(sight_map(p, as, {})), p) | p <- as]))
 
-  function sight_map(p : pt, as : list(pt), m : set(vec)) =
-    switch(as)
-      [] => m
-      q :: as =>
-        if(p == q) sight_map(p, as, m)
-        else       sight_map(p, as, m{[sight_vec(p, q)] = ()})
+  function
+    sight_map : (pt, list(pt), set(vec)) => set(vec)
+    sight_map(_, [], m) = m
+    sight_map(p, q :: as, m) =
+      if(p == q) sight_map(p, as, m)
+      else       sight_map(p, as, m{[sight_vec(p, q)] = ()})
 
   function sight_vec(p1 : pt, p2 : pt) : vec =
     let dx = p2.x - p1.x
@@ -26,18 +27,16 @@ contract Day10 =
   entrypoint solve_2() =
     let p  = {x = 23, y = 20}
     let as = asteroids(0, 0, [], input())
-    let cmp(a, b) = cmp_vecs(Pair.fst(a), Pair.fst(b))
+    let cmp((a, _), (b, _)) = cmp_vecs(a, b)
     let targets = List.map(Pair.snd, List.sort(cmp, Map.to_list(sight_map2(p, as, {}))))
-    switch(List.get(199, blast(targets, [])))
-      (_, v) => v.x * 100 + v.y
+    let (_, v) = List.get(199, blast(targets, []))
+    v.x * 100 + v.y
 
-  function blast(targets, next_rnd) =
-    switch(targets)
-      [] => switch(next_rnd)
-              [] => []
-              _  => blast(List.reverse(next_rnd), [])
-      [] :: targets => blast(targets, next_rnd)
-      (t :: ts) :: targets => t :: blast(targets, ts :: next_rnd)
+  function
+    blast([], [])                         = []
+    blast([], next_rnd)                   = blast(List.reverse(next_rnd), [])
+    blast([] :: targets, next_rnd)        = blast(targets, next_rnd)
+    blast((t :: ts) :: targets, next_rnd) = t :: blast(targets, ts :: next_rnd)
 
   entrypoint quadrant(v : vec) =
     if(v.x >= 0) if(v.y >= 0) 1 else 2
@@ -52,16 +51,15 @@ contract Day10 =
   function cmp_vec(v1 : vec, v2 : vec) =
       v1.y * v2.x =< v2.y * v1.x
 
-  function sight_map2(p : pt, as : list(pt), m : map(vec, list(int * pt))) =
-    switch(as)
-      [] => m
-      q :: as =>
-        if(p == q) sight_map2(p, as, m)
-        else
-          switch(sight_vec2(p, q))
-            (k, vec) =>
-              let ins(v) = List.insert_by((a, b) => a < b, (k, q), v)
-              sight_map2(p, as, m{[vec = []] @ v = ins(v)})
+  function
+    sight_map2 : (pt, list(pt), map(vec, list(int * pt))) => map(vec, list(int * pt))
+    sight_map2(_, [], m) = m
+    sight_map2(p, q :: as, m) =
+      if(p == q) sight_map2(p, as, m)
+      else
+        let (k, vec) = sight_vec2(p, q)
+        let ins(v) = List.insert_by((a, b) => a < b, (k, q), v)
+        sight_map2(p, as, m{[vec = []] @ v = ins(v)})
 
   function sight_vec2(p1 : pt, p2 : pt) : int * vec =
     let dx = p2.x - p1.x
@@ -69,10 +67,9 @@ contract Day10 =
     let k  = gcd(abs(dx), abs(dy))
     (k, {x = dx / k, y = dy / k})
 
-  entrypoint gcd(a : int, b : int) =
-    switch(b)
-      0 => a
-      _ => gcd(b, a mod b)
+  function
+    gcd(a, 0) = a
+    gcd(a, b) = gcd(b, a mod b)
 
   function abs(x : int) =
     if(x < 0) -x else x

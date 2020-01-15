@@ -9,36 +9,6 @@ namespace Intcode =
   function init_proc(code : list(int), input : list(int)) =
     {pc = 0, mem = setup_mem(code), input = input, output = [], rel = 0, route = 0, status = Run}
 
-  function run_prog(pids : list(pid), prog : program) =
-    let prog' = List.foldl(run_prog_step, prog, pids)
-    switch(route_data(pids, prog'))
-      (Done, prog) => prog
-      (Run,  prog) => run_prog(pids, prog)
-
-  function route_data(pids : list(pid), prog : program) =
-    switch(pids)
-      [] => (Run, prog)
-      pid :: pids =>
-        switch(route_data'(pid, prog))
-          (true, prog') => route_data(pids, prog')
-          (false, prog) => (Done, prog)
-
-  function route_data'(pid : pid, prog : program) =
-    let p = prog[pid]
-    switch(p.output)
-      [] => (true, prog)
-      xs =>
-        let q = prog[p.route]
-        switch(q.status)
-          Done => (false, prog)
-          Wait => (true, prog{ [pid] = p{output = []}, [p.route] = q{input = xs, status = Run} })
-
-  function run_prog_step(prog : program, pid : pid) =
-    let p = prog[pid]
-    switch(p.status)
-      Run  => prog{ [pid] = run_proc_step(p) }
-      _    => prog
-
   function run_proc_step(proc) =
     run_proc_step'(proc.pc, proc.mem, proc.rel, proc.input, proc.output)
 
@@ -95,22 +65,22 @@ namespace Intcode =
       _  =>
         abort(String.concat("Bad opcode: ", Int.to_str(opcode)))
 
-  function val(ix : int, mode : int, mem : map(int, int), rel : int) =
-    switch(mode)
-      0 => mem[mem[ix] = 0]
-      1 => mem[ix]
-      2 => mem[rel + mem[ix] = 0]
+  function
+    ptr : (int, int, map(int, int), int) => int
+    ptr(ix, 0, mem, _)   = mem[ix]
+    ptr(ix, 1, _, _)     = ix
+    ptr(ix, 2, mem, rel) = rel + mem[ix]
 
-  function ptr(ix : int, mode : int, mem : map(int, int), rel : int) =
-    switch(mode)
-      0 => mem[ix]
-      1 => ix
-      2 => rel + mem[ix]
+  function
+    val : (int, int, map(int, int), int) => int
+    val(ix, 0, mem, _)   = mem[mem[ix] = 0]
+    val(ix, 1, mem, _)   = mem[ix]
+    val(ix, 2, mem, rel) = mem[rel + mem[ix] = 0]
 
   function setup_mem(is : list(int)) =
     setup_mem'(0, is, {})
 
-  function setup_mem'(ix : int, xs : list(int), m : map(int, int)) =
-    switch(xs)
-      (x :: xs) => setup_mem'(ix + 1, xs, m{[ix] = x})
-      []        => m
+  function
+    setup_mem' : (int, list(int), map(int, int)) => map(int, int)
+    setup_mem'(_, [], m) = m
+    setup_mem'(ix, x :: xs, m) = setup_mem'(ix + 1, xs, m{[ix] = x})

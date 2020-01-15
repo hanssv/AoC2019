@@ -1,3 +1,4 @@
+@compiler >= 4.2.0
 include "List.aes"
 contract Day9 =
   entrypoint solve_1() = run(code(), [1])
@@ -56,25 +57,25 @@ contract Day9 =
       _  =>
         abort(String.concat("Bad opcode: ", Int.to_str(opcode)))
 
-  function ptr(ix : int, mode : int, mem : map(int, int), rel : int) =
-    switch(mode)
-      0 => mem[ix]
-      1 => ix
-      2 => rel + mem[ix]
+  function
+    ptr : (int, int, map(int, int), int) => int
+    ptr(ix, 0, mem, _)   = mem[ix]
+    ptr(ix, 1, _, _)     = ix
+    ptr(ix, 2, mem, rel) = rel + mem[ix]
 
-  function val(ix : int, mode : int, mem : map(int, int), rel : int) =
-    switch(mode)
-      0 => mem[mem[ix] = 0]
-      1 => mem[ix]
-      2 => mem[rel + mem[ix] = 0]
+  function
+    val : (int, int, map(int, int), int) => int
+    val(ix, 0, mem, _)   = mem[mem[ix] = 0]
+    val(ix, 1, mem, _)   = mem[ix]
+    val(ix, 2, mem, rel) = mem[rel + mem[ix] = 0]
 
   function setup_mem(is : list(int)) =
     setup_mem'(0, is, {})
 
-  function setup_mem'(ix : int, xs : list(int), m : map(int, int)) =
-    switch(xs)
-      (x :: xs) => setup_mem'(ix + 1, xs, m{[ix] = x})
-      []        => m
+  function
+    setup_mem' : (int, list(int), map(int, int)) => map(int, int)
+    setup_mem'(_, [], m) = m
+    setup_mem'(ix, x :: xs, m) = setup_mem'(ix + 1, xs, m{[ix] = x})
 
 //   function code0() =
 //     [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]
