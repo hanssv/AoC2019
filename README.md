@@ -7,6 +7,25 @@ around, the twist in this case is that the solutions are written in
 the smart contract language for the [Aeternity
 blockchain](https://aeternity.com/).
 
+## Update 2020-01-16 `@compiler >= 4.2.0`
+
+Below are small notes per day. But following the release of the new Sophia
+compiler (v4.2.0) I also took the time to update the solutions with the new
+syntax (separate entrypoint/function type signature and definition, and pattern
+matching in left-hand sides.
+
+For example this allows us to rewrite:
+```Sophia
+  function cmp(p, q) =
+    switch((p, q))
+      ((x1, y1), (x2, y2)) =>
+        (abs(x1) + abs(y1)) =< (abs(x2) + abs(y2))
+```
+into:
+```Sophia
+  function cmp((x1, y1), (x2, y2)) = abs(x1) + abs(y1) =< abs(x2) + abs(y2)
+```
+
 ### [Day 1](01/sol_01.aes)
 
 This year's Advent of Code [started](https://adventofcode.com/2019/day/1) with
