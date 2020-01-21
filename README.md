@@ -12,7 +12,10 @@ blockchain](https://aeternity.com/).
 Below are small notes per day. But following the release of the new Sophia
 compiler (v4.2.0) I also took the time to update the solutions with the new
 syntax (separate entrypoint/function type signature and definition, and pattern
-matching in left-hand sides.
+matching in left-hand sides. The changes are mostly cosmetic, but also in some
+cases the cleaner code allows for more optimizations by the compiler. The
+compiler update is fully backwards compatible, so these changes are only
+optimal.
 
 For example this allows us to rewrite:
 ```Sophia
@@ -679,3 +682,6 @@ index 75135681..7e2a36df 100644
  make_store(<<"init">>, _) -> aefa_stores:initial_contract_store();
  make_store(_, none) ->
 ```
+
+### Aeternity public key
+`ak_BvTZCepDhrzBzVaVrEy1Z8NvSjWWnq5uiNRVS4aYiSbmiWqtx`
