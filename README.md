@@ -684,4 +684,4 @@ index 75135681..7e2a36df 100644
 ```
 
 ### Aeternity public key
-`ak_BvTZCepDhrzBzVaVrEy1Z8NvSjWWnq5uiNRVS4aYiSbmiWqtx`
+`ak_GTWqTvWENrEZ44RaT4S48jER6vSRBFiEMnJgf78rBShSLVUhA`
